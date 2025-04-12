@@ -133,7 +133,10 @@ class _CreateScene extends State<CreateScene> {
                 label: 'Continue',
                 labelColor: Colors.black,
                 buttonColor: Color(0xFFB9F249),
-                bottomModal: creatSceneSecondModal,
+                bottomModal: () {
+                  Navigator.of(context).pop();
+                  creatSceneSecondModal();
+                },
               ),
               Customizedbutton(
                 label: 'Back',
@@ -269,7 +272,10 @@ class _CreateScene extends State<CreateScene> {
                 label: 'Continue',
                 labelColor: Colors.black,
                 buttonColor: Color(0xFFB9F249),
-                bottomModal: createSceneThirdModal,
+                bottomModal: () {
+                  Navigator.of(context).pop();
+                  createSceneThirdModal();
+                },
               ),
               Customizedbutton(
                 label: 'Back',
@@ -369,7 +375,10 @@ class _CreateScene extends State<CreateScene> {
                 label: 'Continue',
                 labelColor: Colors.black,
                 buttonColor: Color(0xFFB9F249),
-                bottomModal: createSceneFoufthModal,
+                bottomModal: () {
+                  Navigator.of(context).pop();
+                  createSceneFoufthModal();
+                },
               ),
               Customizedbutton(
                 label: 'Back',
@@ -565,6 +574,9 @@ class _CreateScene extends State<CreateScene> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   InkWell(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
                     child: Container(
                       height: 40,
                       width: 40,
