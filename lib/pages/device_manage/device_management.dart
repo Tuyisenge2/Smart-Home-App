@@ -252,133 +252,121 @@ class _deviceManagementState extends State<deviceManagement> {
     );
   }
 
-  // Container roomCard(String L) {
-  //   return Container(
-  //     padding: EdgeInsets.only(
-  //       left: MediaQuery.of(context).size.width * 0.045,
-  //       right: MediaQuery.of(context).size.width * 0.045,
-  //     ),
-  //     height: 60,
-  //     width: double.infinity,
-  //     decoration: BoxDecoration(
-  //       color: Color(0xFF181D23),
-  //       borderRadius: BorderRadius.circular(15),
-  //     ),
-  //     child: Row(
-  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //       children: [
-  //         Text(
-  //           L,
-  //           style: TextStyle(
-  //             color: Color(0xFFFFFFFF),
-  //             fontSize: 17,
-  //             fontWeight: FontWeight.w700,
-  //           ),
-  //         ),
-  //         InkWell(
-  //           onTap: () => _dialogBuilder(context),
-  //           child: SvgPicture.asset(
-  //             "assets/icons/less2.svg",
-  //             height: 16,
-  //             width: 16,
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
   void createSceneThirdModal() {
     showModalBottomSheet(
       barrierColor: Colors.transparent,
       backgroundColor: Color(0xFF31373C),
+      isScrollControlled: true,
       context: context,
       builder: (BuildContext context) {
-        return Container(
+        return Padding(
           padding: EdgeInsets.only(
-            left: MediaQuery.of(context).size.width * 0.03,
-            right: MediaQuery.of(context).size.width * 0.03,
-            //     bottom: MediaQuery.of(context).size.height * 0.04,
+            bottom: MediaQuery.of(context).viewInsets.bottom,
           ),
-          height: MediaQuery.of(context).size.height * 0.4,
-          width: double.infinity,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+          child: SingleChildScrollView(
+            child: Container(
+              padding: EdgeInsets.only(
+                left: MediaQuery.of(context).size.width * 0.03,
+                right: MediaQuery.of(context).size.width * 0.03,
+              ),
+              height: MediaQuery.of(context).size.height * 0.4,
+              width: double.infinity,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  TimesButton(
-                    height: 20,
-                    width: 20,
-                    callback: () {
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TimesButton(
+                        height: 20,
+                        width: 20,
+                        callback: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      Center(
+                        child: Text(
+                          "Light Name",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.02,
+                      ),
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(
+                            width: 2,
+                            color: Color(0xFFB9F249),
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Flexible(
+                              flex: 8,
+                              child: TextField(
+                                decoration: InputDecoration(
+                                  fillColor: Colors.white,
+                                  filled: true,
+                                  border: InputBorder.none,
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                      color: Colors.transparent,
+                                    ), // Border color
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                      color: Colors.transparent,
+                                    ), // Border color
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Flexible(
+                              flex: 1,
+                              child: InkWell(
+                                onTap: () {},
+                                child: Text(
+                                  "×",
+                                  style: TextStyle(
+                                    fontSize: 36,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  Customizedbutton(
+                    label: 'Continue',
+                    labelColor: Colors.black,
+                    buttonColor: Color(0xFFB9F249),
+                    bottomModal: () {
                       Navigator.of(context).pop();
+                      createSceneFoufthModal();
                     },
                   ),
                 ],
               ),
-              Column(
-                children: [
-                  Center(
-                    child: Text(
-                      "Light Name",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                  Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      border: Border.all(width: 2, color: Color(0xFFB9F249)),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Flexible(
-                          flex: 8,
-                          child: TextField(
-                            decoration: InputDecoration(
-                              fillColor: Colors.white,
-                              filled: true,
-                              border: InputBorder.none,
-                            ),
-                          ),
-                        ),
-                        Flexible(
-                          flex: 1,
-                          child: InkWell(
-                            onTap: () {},
-                            child: Text(
-                              "×",
-                              style: TextStyle(
-                                fontSize: 36,
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              Customizedbutton(
-                label: 'Continue',
-                labelColor: Colors.black,
-                buttonColor: Color(0xFFB9F249),
-                bottomModal: () {
-                  Navigator.of(context).pop();
-                  createSceneFoufthModal();
-                },
-              ),
-            ],
+            ),
           ),
         );
       },
