@@ -60,93 +60,119 @@ class _CreateScene extends State<CreateScene> {
       barrierColor: Colors.transparent,
       backgroundColor: Color(0xFF31373C),
       context: context,
+      isScrollControlled: true,
       builder: (BuildContext context) {
-        return Container(
+        return Padding(
           padding: EdgeInsets.only(
-            top: MediaQuery.of(context).size.height * 0.02,
-            left: MediaQuery.of(context).size.width * 0.03,
-            right: MediaQuery.of(context).size.width * 0.03,
+            bottom:
+                MediaQuery.of(
+                  context,
+                ).viewInsets.bottom, // Adjusts for keyboard
           ),
-          height: MediaQuery.of(context).size.height * 0.4,
-          width: double.infinity,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+          child: SingleChildScrollView(
+            child: Container(
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).size.height * 0.02,
+                left: MediaQuery.of(context).size.width * 0.03,
+                right: MediaQuery.of(context).size.width * 0.03,
+              ),
+              height: MediaQuery.of(context).size.height * 0.4,
+              width: double.infinity,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  TimesButton(
-                    height: 20,
-                    width: 20,
-                    callback: () {
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TimesButton(
+                        height: 20,
+                        width: 20,
+                        callback: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  ),
+                  Center(
+                    child: Text(
+                      "Name Scene",
+                      style: TextStyle(
+                        color: Color(0xFFB9F249),
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(width: 2, color: Color(0xFFB9F249)),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Flexible(
+                          flex: 8,
+                          child: TextField(
+                            decoration: InputDecoration(
+                              fillColor: Colors.white,
+                              filled: true,
+                              border: InputBorder.none,
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: Colors.transparent,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: Colors.transparent,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Flexible(
+                          flex: 1,
+                          child: InkWell(
+                            onTap: () {},
+                            child: Text(
+                              "×",
+                              style: TextStyle(
+                                fontSize: 36,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Customizedbutton(
+                    label: 'Continue',
+                    labelColor: Colors.black,
+                    buttonColor: Color(0xFFB9F249),
+                    bottomModal: () {
+                      Navigator.of(context).pop();
+                      creatSceneSecondModal();
+                    },
+                  ),
+                  Customizedbutton(
+                    label: 'Back',
+                    labelColor: Color(0xFFB9F249),
+                    buttonColor: Color(0xFF31373C),
+                    bottomModal: () {
                       Navigator.of(context).pop();
                     },
                   ),
                 ],
               ),
-              Center(
-                child: Text(
-                  "Name Scene",
-                  style: TextStyle(
-                    color: Color(0xFFB9F249),
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(width: 2, color: Color(0xFFB9F249)),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Flexible(
-                      flex: 8,
-                      child: TextField(
-                        decoration: InputDecoration(
-                          fillColor: Colors.white,
-                          filled: true,
-                          border: InputBorder.none,
-                        ),
-                      ),
-                    ),
-                    Flexible(
-                      flex: 1,
-                      child: InkWell(
-                        onTap: () {},
-                        child: Text(
-                          "×",
-                          style: TextStyle(fontSize: 36, color: Colors.grey),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Customizedbutton(
-                label: 'Continue',
-                labelColor: Colors.black,
-                buttonColor: Color(0xFFB9F249),
-                bottomModal: () {
-                  Navigator.of(context).pop();
-                  creatSceneSecondModal();
-                },
-              ),
-              Customizedbutton(
-                label: 'Back',
-                labelColor: Color(0xFFB9F249),
-                buttonColor: Color(0xFF31373C),
-                bottomModal: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
+            ),
           ),
         );
       },
