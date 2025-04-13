@@ -6,7 +6,12 @@ import 'package:flutter_svg/svg.dart';
 class RoomsComponent extends StatelessWidget {
   final String roomName;
   final int deviceCount;
-  const RoomsComponent({required this.roomName, required this.deviceCount});
+  final String isRoomorHome;
+  const RoomsComponent({
+    required this.roomName,
+    required this.deviceCount,
+    required this.isRoomorHome,
+  });
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -25,7 +30,16 @@ class RoomsComponent extends StatelessWidget {
       ),
       child: Stack(
         children: [
-        
+          isRoomorHome == 'Room'
+              ? Positioned(
+                right: 10,
+                top: 10,
+                child: InkWell(
+                  onTap: () {},
+                  child: SvgPicture.asset('assets/icons/toggleButton.svg'),
+                ),
+              )
+              : Text(''),
           Positioned(
             bottom: 0,
             left: 0,
@@ -78,20 +92,20 @@ class RoomsComponent extends StatelessWidget {
                           ),
                         ],
                       ),
-                      InkWell(
-                        onTap: () {},
-                        child: SvgPicture.asset(
-                          'assets/icons/toggleButton.svg',
-                        ),
-                      ),
+                      isRoomorHome == 'Home'
+                          ? InkWell(
+                            onTap: () {},
+                            child: SvgPicture.asset(
+                              'assets/icons/toggleButton.svg',
+                            ),
+                          )
+                          : Text(''),
                     ],
                   ),
                 ),
               ),
             ),
           ),
-      
-      
         ],
       ),
     );

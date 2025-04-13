@@ -369,7 +369,7 @@ class DashHome extends StatelessWidget {
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [DeviceCard() , DeviceCard()],
+                    children: [DeviceCard(), DeviceCard()],
                   ),
                   SizedBox(height: 16),
 
@@ -385,10 +385,26 @@ class DashHome extends StatelessWidget {
               Column(
                 spacing: 15,
                 children: [
-                  RoomsComponent(roomName: 'Living Room', deviceCount: 5),
-                  RoomsComponent(roomName: 'Bed Room', deviceCount: 2),
-                  RoomsComponent(roomName: 'Bed Room 2', deviceCount: 1),
-                  RoomsComponent(roomName: 'Kitchen', deviceCount: 1),
+                  RoomsComponent(
+                    roomName: 'Living Room',
+                    deviceCount: 2,
+                    isRoomorHome: 'Home',
+                  ),
+                  RoomsComponent(
+                    roomName: 'Bed Room',
+                    deviceCount: 2,
+                    isRoomorHome: 'Home',
+                  ),
+                  RoomsComponent(
+                    roomName: 'Bed Room 2',
+                    deviceCount: 1,
+                    isRoomorHome: 'Home',
+                  ),
+                  RoomsComponent(
+                    roomName: 'Kitchen',
+                    deviceCount: 1,
+                    isRoomorHome: 'Home',
+                  ),
                 ],
               ),
             ],

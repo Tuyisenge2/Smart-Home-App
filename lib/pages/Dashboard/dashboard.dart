@@ -18,10 +18,10 @@ class _DashboardState extends State<DashboardWithBottom> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: NavBar(),
+        title: pageIndex == 0 ? NavBar() : null,
         backgroundColor: Colors.white.withOpacity(0),
         automaticallyImplyLeading: false,
-        toolbarHeight: 80,
+        toolbarHeight: pageIndex == 0 ? 80 : 0,
       ),
       body: pages[pageIndex],
       backgroundColor: Colors.white.withOpacity(.1),
@@ -38,7 +38,7 @@ class _DashboardState extends State<DashboardWithBottom> {
         heightFactor: 0.8,
         child: Container(
           height: 60,
-          decoration: BoxDecoration(color: Colors.black.withOpacity(0.3)),
+          decoration: BoxDecoration(color: Colors.black.withOpacity(0.3) ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
