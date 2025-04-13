@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:new_app/components/customizedButton.dart';
-import 'package:new_app/components/responsive_text.dart';
 import 'package:new_app/components/rooms_component.dart';
 
 class DashRoom extends StatelessWidget {
