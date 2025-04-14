@@ -1,15 +1,8 @@
 import 'package:flutter/material.dart';
 
-class RoomDetails extends StatefulWidget {
-  const RoomDetails({super.key});
-
-  @override
-  State<RoomDetails> createState() => _RoomDetailsState();
-}
-
-class _RoomDetailsState extends State<RoomDetails> {
+class RoomDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(body: Text('abwira ko ankunda buri munsi '));
   }
 }
