@@ -9,6 +9,7 @@ import 'package:new_app/pages/hero_section.dart';
 import 'package:new_app/pages/login.dart' show Login;
 import 'package:new_app/pages/profile_page.dart';
 import 'package:new_app/pages/room_manage/room_details.dart';
+import 'package:new_app/pages/room_manage/room_single_device.dart';
 import 'package:new_app/pages/scene/create_scene.dart';
 import 'package:new_app/pages/signup.dart' show Signup;
 
@@ -33,6 +34,8 @@ class MyApp extends StatelessWidget {
       GoRoute(path: '/createScene', builder: (context, state) => CreateScene()),
       GoRoute(path: '/device', builder: (context, state) => deviceManagement()),
       GoRoute(path: '/roomDetail', builder: (context, state) => RoomDetails()),
+      GoRoute(path: '/roomDeviceDetail', builder: (context, state) => RoomSingleDevice()),
+
     ],
   );
 

@@ -30,8 +30,7 @@ class RoomsComponent extends StatelessWidget {
           fit: BoxFit.cover,
         ),
       ),
-      child:
-       Stack(
+      child: Stack(
         children: [
           isRoomorHome == 'Room'
               ? Positioned(
@@ -72,7 +71,7 @@ class RoomsComponent extends StatelessWidget {
                           ),
                           InkWell(
                             onTap: () {
-                              context.push('/profile');
+                              context.push('/roomDetail');
                             },
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,

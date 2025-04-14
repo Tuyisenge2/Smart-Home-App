@@ -381,7 +381,6 @@ class _deviceManagementState extends State<deviceManagement> {
       builder: (BuildContext context) {
         return Container(
           padding: EdgeInsets.only(
-            //     top: MediaQuery.of(context).size.height * 0.01,
             left: MediaQuery.of(context).size.width * 0.03,
             right: MediaQuery.of(context).size.width * 0.03,
           ),
