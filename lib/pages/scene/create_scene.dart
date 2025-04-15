@@ -109,7 +109,7 @@ class _CreateScene extends State<CreateScene> {
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      border: Border.all(width: 2, color: Color(0xFFB9F249)),
+                      border: Border.all(width: 2, color: Color(0xFFB9F249) ),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(

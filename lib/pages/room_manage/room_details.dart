@@ -104,18 +104,27 @@ class RoomDetails extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                  InkWell(
-                    onTap: () {
-                      context.push('/roomDeviceDetail');
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: MediaQuery.of(context).size.width * 0.03,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [DeviceCard(), DeviceCard()],
-                      ),
+
+                  Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: MediaQuery.of(context).size.width * 0.03,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            context.push('/roomDeviceDetail');
+                          },
+                          child: DeviceCard(),
+                        ),
+                        InkWell(
+                          onTap: () {
+                            context.push('/roomDeviceDetail');
+                          },
+                          child: DeviceCard(),
+                        ),
+                      ],
                     ),
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.02),
