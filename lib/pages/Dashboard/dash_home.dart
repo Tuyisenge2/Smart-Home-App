@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:new_app/components/device_card.dart';
 import 'package:new_app/components/device_card2.dart';
 import 'package:new_app/components/plus_button.dart';
@@ -7,7 +8,7 @@ import 'package:new_app/components/rooms_component.dart';
 import 'package:new_app/components/scene_card.dart';
 import 'package:new_app/components/title_add.dart';
 
-class Dash2 extends StatelessWidget {
+class DashHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -329,7 +330,7 @@ class Dash2 extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 10),
-             
+
               Container(
                 padding: EdgeInsets.all(4),
                 decoration: BoxDecoration(
@@ -352,10 +353,17 @@ class Dash2 extends StatelessWidget {
                   ],
                 ),
               ),
-              
-              
+
               SizedBox(height: 10),
-              TitleAdd(firstLabel: 'My Device', AddLabel: 'Add Device'),
+              InkWell(
+                onTap: () {
+                  context.push('/device');
+                },
+                child: TitleAdd(
+                  firstLabel: 'My Device',
+                  AddLabel: 'Add Device',
+                ),
+              ),
               SizedBox(height: 10),
               Column(
                 children: [
@@ -377,10 +385,26 @@ class Dash2 extends StatelessWidget {
               Column(
                 spacing: 15,
                 children: [
-                  RoomsComponent(roomName: 'Living Room', deviceCount: 5),
-                  RoomsComponent(roomName: 'Bed Room', deviceCount: 2),
-                  RoomsComponent(roomName: 'Bed Room 2', deviceCount: 1),
-                  RoomsComponent(roomName: 'Kitchen', deviceCount: 1),
+                  RoomsComponent(
+                    roomName: 'Living Room',
+                    deviceCount: 2,
+                    isRoomorHome: 'Home',
+                  ),
+                  RoomsComponent(
+                    roomName: 'Bed Room',
+                    deviceCount: 2,
+                    isRoomorHome: 'Home',
+                  ),
+                  RoomsComponent(
+                    roomName: 'Bed Room 2',
+                    deviceCount: 1,
+                    isRoomorHome: 'Home',
+                  ),
+                  RoomsComponent(
+                    roomName: 'Kitchen',
+                    deviceCount: 1,
+                    isRoomorHome: 'Home',
+                  ),
                 ],
               ),
             ],

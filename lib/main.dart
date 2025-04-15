@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:new_app/pages/Dashboard/Dashboard.dart';
-import 'package:new_app/pages/LoginPage.dart';
-import 'package:new_app/pages/ResetPassword.dart' show Resetpassword;
+//import 'package:new_app/pages/ResetPassword.dart' show Resetpassword;
+import 'package:new_app/pages/device_manage/device_management.dart';
 import 'package:new_app/pages/forgetPassword.dart' show Forgetpassword;
 import 'package:new_app/pages/hero_section.dart';
-import 'package:new_app/pages/home.dart';
+//import 'package:new_app/pages/home.dart';
 import 'package:new_app/pages/login.dart' show Login;
 import 'package:new_app/pages/profile_page.dart';
+import 'package:new_app/pages/room_manage/room_details.dart';
+import 'package:new_app/pages/room_manage/room_single_device.dart';
 import 'package:new_app/pages/scene/create_scene.dart';
 import 'package:new_app/pages/signup.dart' show Signup;
 
@@ -30,6 +32,10 @@ class MyApp extends StatelessWidget {
       ),
       GoRoute(path: '/profile', builder: (context, state) => ProfilePage()),
       GoRoute(path: '/createScene', builder: (context, state) => CreateScene()),
+      GoRoute(path: '/device', builder: (context, state) => deviceManagement()),
+      GoRoute(path: '/roomDetail', builder: (context, state) => RoomDetails()),
+      GoRoute(path: '/roomDeviceDetail', builder: (context, state) => RoomSingleDevice()),
+
     ],
   );
 
@@ -38,9 +44,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
-      //theme: ThemeData(fontFamily: ''),
-      //home: HeroSection(),
-      //home: ProfilePage(),
       routerConfig: _router,
     );
   }

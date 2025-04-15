@@ -2,11 +2,18 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 
 class RoomsComponent extends StatelessWidget {
   final String roomName;
   final int deviceCount;
-  const RoomsComponent({required this.roomName, required this.deviceCount});
+  final String isRoomorHome;
+  const RoomsComponent({
+    super.key,
+    required this.roomName,
+    required this.deviceCount,
+    required this.isRoomorHome,
+  });
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -25,7 +32,16 @@ class RoomsComponent extends StatelessWidget {
       ),
       child: Stack(
         children: [
-        
+          isRoomorHome == 'Room'
+              ? Positioned(
+                right: 10,
+                top: 10,
+                child: InkWell(
+                  onTap: () {},
+                  child: SvgPicture.asset('assets/icons/toggleButton.svg'),
+                ),
+              )
+              : Text(''),
           Positioned(
             bottom: 0,
             left: 0,
@@ -53,45 +69,48 @@ class RoomsComponent extends StatelessWidget {
                               fontSize: 18,
                             ),
                           ),
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text(
-                                deviceCount < 2
-                                    ? '$deviceCount Device'
-                                    : '$deviceCount Devices',
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(0.6),
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 14,
+                          InkWell(
+                            onTap: () {
+                              context.push('/roomDetail');
+                            },
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Text(
+                                  deviceCount < 2
+                                      ? '$deviceCount Device'
+                                      : '$deviceCount Devices',
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.6),
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 14,
+                                  ),
                                 ),
-                              ),
-                              SizedBox(width: 10),
-                              InkWell(
-                                child: SvgPicture.asset(
+                                SizedBox(width: 10),
+                                SvgPicture.asset(
                                   'assets/icons/less2.svg',
                                   height: 10,
                                   width: 10,
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ],
                       ),
-                      InkWell(
-                        onTap: () {},
-                        child: SvgPicture.asset(
-                          'assets/icons/toggleButton.svg',
-                        ),
-                      ),
+                      isRoomorHome == 'Home'
+                          ? InkWell(
+                            onTap: () {},
+                            child: SvgPicture.asset(
+                              'assets/icons/toggleButton.svg',
+                            ),
+                          )
+                          : Text(''),
                     ],
                   ),
                 ),
               ),
             ),
           ),
-      
-      
         ],
       ),
     );

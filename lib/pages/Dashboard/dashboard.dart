@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:new_app/components/nav_bar.dart';
-import 'package:new_app/pages/Dashboard/dash2.dart';
-import 'package:new_app/pages/Dashboard/dash3.dart';
-import 'package:new_app/pages/Dashboard/dash4.dart';
+import 'package:new_app/pages/Dashboard/dash_menu.dart';
+import 'package:new_app/pages/Dashboard/dash_room.dart';
+import 'package:new_app/pages/Dashboard/dash_home.dart';
 
 class DashboardWithBottom extends StatefulWidget {
   @override
@@ -13,15 +13,15 @@ class DashboardWithBottom extends StatefulWidget {
 class _DashboardState extends State<DashboardWithBottom> {
   void init() {}
   int pageIndex = 0;
-  final pages = [Dash2(), Dash3(), Dash4()];
+  final pages = [DashHome(), DashRoom(), DashMenu()];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: NavBar(),
+        title: pageIndex == 0 ? NavBar() : null,
         backgroundColor: Colors.white.withOpacity(0),
         automaticallyImplyLeading: false,
-        toolbarHeight: 80,
+        toolbarHeight: pageIndex == 0 ? 80 : 0,
       ),
       body: pages[pageIndex],
       backgroundColor: Colors.white.withOpacity(.1),
@@ -38,7 +38,7 @@ class _DashboardState extends State<DashboardWithBottom> {
         heightFactor: 0.8,
         child: Container(
           height: 60,
-          decoration: BoxDecoration(color: Colors.black.withOpacity(0.3)),
+          decoration: BoxDecoration(color: Colors.black.withOpacity(0.3) ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [

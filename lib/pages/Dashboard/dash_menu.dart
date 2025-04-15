@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-class Dash4 extends StatelessWidget {
-  const Dash4({super.key});
+class DashMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
