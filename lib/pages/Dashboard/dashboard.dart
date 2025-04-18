@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:new_app/components/nav_bar.dart';
+import 'package:new_app/pages/Dashboard/dash3.dart';
 import 'package:new_app/pages/Dashboard/dash_menu.dart';
 import 'package:new_app/pages/Dashboard/dash_room.dart';
 import 'package:new_app/pages/Dashboard/dash_home.dart';
@@ -13,7 +14,8 @@ class DashboardWithBottom extends StatefulWidget {
 class _DashboardState extends State<DashboardWithBottom> {
   void init() {}
   int pageIndex = 0;
-  final pages = [DashHome(), DashRoom(), DashMenu()];
+  final pages = [DashHome(), RoomsPage(), DashMenu()];
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
