@@ -13,7 +13,7 @@ class DashboardWithBottom extends StatefulWidget {
 class _DashboardState extends State<DashboardWithBottom> {
   void init() {}
   int pageIndex = 0;
-  final pages = [Dash2(), Dash3(), Dash4()];
+  final pages = [Dash2(), RoomsPage(), Dash4()];
   @override
   Widget build(BuildContext context) {
     return Scaffold(

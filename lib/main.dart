@@ -21,6 +21,7 @@ class MyApp extends StatelessWidget {
   final GoRouter _router = GoRouter(
     routes: [
       GoRoute(path: '/', builder: (context, state) => HeroSection()),
+      GoRoute(path: '/', builder: (context, state) => HeroSection()),
       GoRoute(path: '/Login', builder: (context, state) => Login()),
       GoRoute(path: '/signup', builder: (context, state) => Signup()),
       GoRoute(path: '/forget', builder: (context, state) => Forgetpassword()),
