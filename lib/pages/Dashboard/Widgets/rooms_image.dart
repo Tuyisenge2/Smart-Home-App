@@ -12,7 +12,7 @@ class _SelectRoomImageSheetState extends State<SelectRoomImageSheet> {
 
   final List<String> imagePaths = [
     'assets/images/bedRoom.jpg',
-    'assets/images/bedroom.jpeg',
+    'assets/images/livingRoom.jpg',
     'assets/images/bedroom2.jpeg',
     'assets/images/kitchen.jpg',
     

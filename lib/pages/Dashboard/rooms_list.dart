@@ -29,8 +29,8 @@ class RoomList extends StatefulWidget {
 
 class _RoomListState extends State<RoomList> {
   final List<Room> rooms = [
-    Room(imagePath: 'assets/images/livingroom.jpeg', title: 'Living Room', deviceCount: 5),
-    Room(imagePath: 'assets/images/bedroom.jpeg', title: 'Bedroom', deviceCount: 4),
+    Room(imagePath: 'assets/images/livingRoom.jpg', title: 'Living Room', deviceCount: 5),
+    Room(imagePath: 'assets/images/bedRoom.jpg', title: 'Bedroom', deviceCount: 4),
     Room(imagePath: 'assets/images/bedroom2.jpeg', title: 'Bedroom 2', deviceCount: 4),
     Room(imagePath: 'assets/images/kitchen.jpg', title: 'Kitchen', deviceCount: 2),
   ];
