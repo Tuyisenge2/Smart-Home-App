@@ -13,7 +13,8 @@ class BackButtonComponent extends StatelessWidget {
   });
   @override
   Widget build(BuildContext context) {
-    return IconButton(
+    return
+     IconButton(
       //   onPressed: () => context.go(route),
       onPressed: () => context.pop(),
 

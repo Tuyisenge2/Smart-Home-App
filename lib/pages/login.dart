@@ -3,12 +3,42 @@ import 'package:flutter_svg/svg.dart' show SvgPicture;
 import 'package:go_router/go_router.dart';
 import 'package:new_app/components/back_button.dart';
 import 'package:new_app/components/forget_button.dart';
-import 'package:new_app/components/input_field.dart';
+//import 'package:new_app/components/input_field.dart';
 import 'package:new_app/components/responsive_text.dart';
+import 'package:new_app/models/user_login_response.dart';
+import 'package:new_app/provider/is_user_auth_provider.dart';
+import 'package:new_app/services/auth_service.dart';
+//import 'package:new_app/provider/user_provider.dart';
+import 'package:new_app/services/login_service.dart';
+import 'package:new_app/services/prefs.dart';
+import 'package:new_app/util/snack_bar.dart';
+import 'package:new_app/util/validators.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class Login extends StatelessWidget {
+class Login extends StatefulWidget {
+  const Login({Key? key}) : super(key: key);
+
+  @override
+  State<Login> createState() => loginScreen();
+}
+
+class loginScreen extends State<Login> {
+  // final TextEditingController _emailController = TextEditingController();
+  // final TextEditingController _passwordController = TextEditingController();
+  String email = '';
+  String password = '';
+  Future<UserLoginResponse>? futureLogin;
+  bool _emailValidate = false;
+  bool _passwordValidate = false;
+  String? _emailErrorMessage; // Separate error for email
+  String? _passwordErrorMessage;
   @override
   Widget build(BuildContext context) {
+    //  var userName=context.watch<UserProvider>().userName;
+    //  String userName =Provider.of<UserProvider>(context, listen: false).userName;
+    // String token = Provider.of<IsUserAuthProvider>(context).token;
+    bool isLoading = Provider.of<AuthService>(context).isLoading;
     return Container(
       width: double.infinity,
       height: double.infinity,
@@ -85,15 +115,23 @@ class Login extends StatelessWidget {
                     ),
                     SizedBox(height: 20),
                     InputField(
-                      width: 400,
-                      hint: 'Email',
-                      inputColor: Colors.white,
+                      400,
+                      'Email',
+                      Colors.white,
+                      'email',
+                      false,
+                      _emailValidate,
+                      _emailErrorMessage ?? 'Enter a valid email address',
                     ),
                     SizedBox(height: 10),
                     InputField(
-                      width: 400,
-                      hint: 'Password',
-                      inputColor: Colors.white,
+                      400,
+                      'Password',
+                      Colors.white,
+                      'password',
+                      true,
+                      _passwordValidate,
+                      _passwordErrorMessage ?? 'Enter a valid password',
                     ),
 
                     SizedBox(height: 20),
@@ -101,19 +139,138 @@ class Login extends StatelessWidget {
                       height: 47,
                       width: 400,
                       child: TextButton(
-                        onPressed: () {
-                          context.push('/dashboard');
-                        },
+                        onPressed:
+                            isLoading
+                                ? null
+                                : () async {
+                                  try {
+                                    context.read<AuthService>().setIsLoading(
+                                      true,
+                                    );
+                                    setState(() {
+                                      // Reset validation states
+                                      _emailValidate = false;
+                                      _passwordValidate = false;
+                                      _emailErrorMessage =
+                                          null; // Set email error
+                                      _passwordErrorMessage = null;
+                                    });
+                                    final emailError = Validators.validateEmail(
+                                      email,
+                                    );
+                                    final passwordError =
+                                        Validators.validatePassword(password);
+
+                                    if (emailError != null ||
+                                        passwordError != null) {
+                                      setState(() {
+                                        _emailValidate = emailError != null;
+                                        _passwordValidate =
+                                            passwordError != null;
+                                        _emailErrorMessage = emailError;
+                                        _passwordErrorMessage = passwordError;
+                                      });
+                                      return;
+                                    }
+
+                                    final response = await loginUser(
+                                      email,
+                                      password,
+                                    );
+                                    if (response.access_token.isNotEmpty) {
+                                      print(
+                                        'LLLLLLLLLLLLLLLLLLLLLLLLLLLLLGGGGGGOOOOOOOOOOOOOOOOOOOOOOOOOOOOOIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII ${response.user}',
+                                      );
+
+                                      final userMap =
+                                          response.user as Map<String, dynamic>;
+                                      final isActive =
+                                          userMap['is_active'] as int? ?? 0;
+                                      final userEmail =
+                                          userMap['name'] as String? ?? '';
+
+                                      if (isActive != 1) {
+                                       
+                                        showTopSnackBar(
+                                          context,
+                                          '  This account has been deactivated, contact for support',
+                                          Colors.red,
+                                        );
+                                        return;
+                                      }                                                                  
+                                      await context
+                                          .read<AuthService>()
+                                          .saveToken(response.access_token);
+
+                                      context.read<AuthService>().setname(
+                                        userEmail,
+                                      );
+
+                                      upDatePrefs(
+                                        'token',
+                                        response.access_token,
+                                      );
+
+                                      if (mounted) {
+                                        context.push('/dashboard');
+                                      }
+                                    } else {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            'Login failed - no token received',
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  } catch (e) {
+                                    // Handle errors
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          'Login error: ${e.toString()}',
+                                        ),
+                                      ),
+                                    );
+                                  } finally {
+                                    // Ensure loading is set to false when done
+                                    context.read<AuthService>().setIsLoading(
+                                      false,
+                                    );
+                                  }
+                                },
                         style: TextButton.styleFrom(
                           backgroundColor: Colors.green,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.all(Radius.circular(8)),
                           ),
                         ),
-                        child: Text(
-                          "LOGIN",
-                          style: TextStyle(color: Colors.white),
-                        ),
+                        child:
+                            isLoading
+                                ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "LOGIN",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    SizedBox(width: 10),
+                                    SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 3,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                                : Text(
+                                  "LOGIN",
+                                  style: TextStyle(color: Colors.white),
+                                ),
                       ),
                     ),
                     SizedBox(height: 10),
@@ -212,6 +369,43 @@ class Login extends StatelessWidget {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  ConstrainedBox InputField(
+    double width,
+    String hint,
+    Color inputColor,
+    String input,
+    bool isPassword,
+    bool _validate,
+    String _errorMessage,
+  ) {
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: width),
+      child: TextField(
+        onChanged: (value) {
+          setState(() {
+            if (input == 'email') {
+              email = value;
+            } else if (input == 'password') {
+              password = value;
+            }
+          });
+        },
+        obscureText: isPassword,
+        obscuringCharacter: '*',
+        decoration: InputDecoration(
+          hintText: hint,
+          fillColor: inputColor,
+          filled: true,
+          border: OutlineInputBorder(
+            borderSide: BorderSide(color: inputColor),
+            borderRadius: BorderRadius.all(Radius.circular(8)),
+          ),
+          errorText: _validate ? _errorMessage : null,
         ),
       ),
     );

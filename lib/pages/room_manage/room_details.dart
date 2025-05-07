@@ -5,8 +5,21 @@ import 'package:new_app/components/customizedButton.dart';
 import 'package:new_app/components/device_card.dart';
 
 class RoomDetails extends StatelessWidget {
-  final List<String> entries = <String>['a', 'b', 'c'];
-  final List<int> colorCodes = <int>[600, 400, 500];
+  // final List<String> entries = <String>['a', 'b', 'c'];
+  // final List<int> colorCodes = <int>[600, 400, 500];
+  final int id;
+  final String name;
+  final int count;
+  final List<dynamic> devices;
+  final String image_path;
+  RoomDetails({
+    super.key,
+    required this.id,
+    required this.name,
+    required this.count,
+    required this.devices,
+    required this.image_path,
+  });
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,7 +34,7 @@ class RoomDetails extends StatelessWidget {
                     height: MediaQuery.of(context).size.height * 0.48,
                     decoration: BoxDecoration(
                       image: DecorationImage(
-                        image: AssetImage('assets/images/livingRoom.jpg'),
+                        image: NetworkImage(image_path),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -68,9 +81,9 @@ class RoomDetails extends StatelessWidget {
                                 InkWell(
                                   onTap: () {},
                                   child: Text(
-                                    "Living Room",
+                                    name, //  "Living Room",
                                     style: TextStyle(
-                                      color: Colors.white,
+                                      color: Colors.black,
                                       fontSize: 20,
                                       fontWeight: FontWeight.w800,
                                     ),
@@ -103,51 +116,79 @@ class RoomDetails extends StatelessWidget {
                       ],
                     ),
                   ),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
 
                   Padding(
                     padding: EdgeInsets.symmetric(
                       horizontal: MediaQuery.of(context).size.width * 0.03,
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    child: Column(
                       children: [
-                        InkWell(
-                          onTap: () {
-                            context.push('/roomDeviceDetail');
-                          },
-                          child: DeviceCard(),
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.35,
+                          child:
+                              devices.isEmpty
+                                  ? Text(
+                                    'No devices found in this room',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  )
+                                  : ListView.builder(
+                                    itemCount: (devices.length / 2).ceil(),
+                                    itemBuilder: (context, rowIndex) {
+                                      final firstIndex = rowIndex * 2;
+                                      return Padding(
+                                        padding: EdgeInsets.only(bottom: 3),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            DeviceCard(
+                                              name: devices[firstIndex]['name'],
+                                              imageUrl:
+                                                  devices[firstIndex]['images'] !=
+                                                          ''
+                                                      ? devices[firstIndex]['images']
+                                                      : 'assets/images/AirCond.png',
+                                              id: devices[firstIndex]['id'],
+                                              isActive:
+                                                  devices[firstIndex]['is_active'] ==
+                                                  1,
+                                              roomName: name,
+                                            ),
+                                            if (firstIndex + 1 < devices.length)
+                                              DeviceCard(
+                                                id:
+                                                    devices[firstIndex +
+                                                        1]['id'],
+                                                name:
+                                                    devices[firstIndex +
+                                                        1]['name'],
+                                                imageUrl:
+                                                    devices[firstIndex]['images'] !=
+                                                            ''
+                                                        ? devices[firstIndex]['images']
+                                                        : 'assets/images/AirCond.png',
+                                                isActive:
+                                                    devices[firstIndex +
+                                                        1]['is_active'] ==
+                                                    1,
+                                                roomName: name,
+                                              ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  ),
                         ),
-                        InkWell(
-                          onTap: () {
-                            context.push('/roomDeviceDetail');
-                          },
-                          child: DeviceCard(),
-                        ),
+                        SizedBox(height: 16),
                       ],
                     ),
                   ),
+
                   SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: MediaQuery.of(context).size.width * 0.03,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [DeviceCard(), DeviceCard()],
-                    ),
-                  ),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: MediaQuery.of(context).size.width * 0.03,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [DeviceCard(), DeviceCard()],
-                    ),
-                  ),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.09),
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.9,
                     child: Customizedbutton(
@@ -155,7 +196,7 @@ class RoomDetails extends StatelessWidget {
                       labelColor: Colors.black,
                       buttonColor: Color(0xFFB9F249),
                       bottomModal: () {
-                        Navigator.of(context).pop();
+                        context.push('/device');
                       },
                     ),
                   ),

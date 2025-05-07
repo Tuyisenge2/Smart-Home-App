@@ -7,8 +7,9 @@ class TitleAdd extends StatelessWidget {
   const TitleAdd({required this.firstLabel, required this.AddLabel});
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           firstLabel,

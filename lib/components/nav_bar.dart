@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:new_app/components/responsive_text.dart';
 import 'package:go_router/go_router.dart';
+import 'package:new_app/services/auth_service.dart';
+import 'package:provider/provider.dart';
 
 class NavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    dynamic userName = context.watch<AuthService>().getname;
     return SizedBox(
       width: double.infinity,
       child: FractionallySizedBox(
@@ -32,12 +35,12 @@ class NavBar extends StatelessWidget {
             ResponsiveText(
               textColor: Colors.white,
               fontSize: 24,
-              text: "Sarah",
+              text: userName ?? '',
             ),
             Flexible(
               child: InkWell(
                 onTap: () {
-                  print("hey");
+                  context.push('/notification');
                 },
                 child: Container(
                   height: 39,

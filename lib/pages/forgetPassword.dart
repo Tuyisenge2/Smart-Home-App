@@ -28,7 +28,7 @@ class Forgetpassword extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              BackButtonComponent(route: "/login"),
+              BackButtonComponent(route: "/Login"),
 
               Row(
                 children: [

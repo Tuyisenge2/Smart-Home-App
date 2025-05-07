@@ -3,17 +3,26 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:new_app/provider/rooms_provider.dart';
+import 'package:provider/provider.dart';
 
 class RoomsComponent extends StatelessWidget {
   final String roomName;
   final int deviceCount;
+  final int id;
   final String isRoomorHome;
+  final List<dynamic> devices;
+  final String image_path;
   const RoomsComponent({
     super.key,
     required this.roomName,
     required this.deviceCount,
     required this.isRoomorHome,
+    required this.id,
+    required this.devices,
+    required this.image_path,
   });
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -26,22 +35,12 @@ class RoomsComponent extends StatelessWidget {
           topRight: Radius.circular(10),
         ),
         image: DecorationImage(
-          image: AssetImage('assets/images/livingRoom.jpg'),
+          image: NetworkImage(image_path),
           fit: BoxFit.cover,
         ),
       ),
       child: Stack(
         children: [
-          isRoomorHome == 'Room'
-              ? Positioned(
-                right: 10,
-                top: 10,
-                child: InkWell(
-                  onTap: () {},
-                  child: SvgPicture.asset('assets/icons/toggleButton.svg'),
-                ),
-              )
-              : Text(''),
           Positioned(
             bottom: 0,
             left: 0,
@@ -64,14 +63,23 @@ class RoomsComponent extends StatelessWidget {
                           Text(
                             roomName,
                             style: TextStyle(
-                              color: Colors.white,
+                              color: Colors.black,
                               fontWeight: FontWeight.w700,
                               fontSize: 18,
                             ),
                           ),
                           InkWell(
                             onTap: () {
-                              context.push('/roomDetail');
+                              context.push(
+                                '/roomDetail',
+                                extra: {
+                                  'id': id,
+                                  'name': roomName,
+                                  'deviceCount': deviceCount,
+                                  'devices': devices,
+                                  'image_path':image_path
+                                },
+                              );
                             },
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -81,7 +89,7 @@ class RoomsComponent extends StatelessWidget {
                                       ? '$deviceCount Device'
                                       : '$deviceCount Devices',
                                   style: TextStyle(
-                                    color: Colors.white.withOpacity(0.6),
+                                    color: Colors.black,
                                     fontWeight: FontWeight.w700,
                                     fontSize: 14,
                                   ),
@@ -97,14 +105,6 @@ class RoomsComponent extends StatelessWidget {
                           ),
                         ],
                       ),
-                      isRoomorHome == 'Home'
-                          ? InkWell(
-                            onTap: () {},
-                            child: SvgPicture.asset(
-                              'assets/icons/toggleButton.svg',
-                            ),
-                          )
-                          : Text(''),
                     ],
                   ),
                 ),
