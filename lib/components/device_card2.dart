@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-class DeviceCard2 extends StatelessWidget {
+class DeviceCard2 extends StatefulWidget {
+  const DeviceCard2({super.key});
+
+  @override
+  _DeviceCard2State createState() => _DeviceCard2State();
+}
+
+class _DeviceCard2State extends State<DeviceCard2> {
+  bool isToggleOn = false;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -52,8 +60,17 @@ class DeviceCard2 extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(left: 59.0),
                   child: InkWell(
-                    onTap: () {},
-                    child: SvgPicture.asset('assets/icons/toggleButton.svg'),
+                    onTap: () {
+                      setState(() {
+                        isToggleOn = !isToggleOn;
+                      });
+                    },
+                    child:
+                        isToggleOn
+                            ? SvgPicture.asset('assets/icons/toggleButtonOn.svg')
+                            : SvgPicture.asset(
+                              'assets/icons/toggleButton.svg',
+                            ),
                   ),
                 ),
               ],
