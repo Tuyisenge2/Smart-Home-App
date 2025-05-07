@@ -7,6 +7,7 @@ import 'package:new_app/components/plus_button.dart';
 import 'package:new_app/components/rooms_component.dart';
 import 'package:new_app/components/scene_card.dart';
 import 'package:new_app/components/title_add.dart';
+import 'package:new_app/pages/Dashboard/rooms_list.dart';
 
 class DashHome extends StatelessWidget {
   @override
@@ -380,7 +381,15 @@ class DashHome extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 20),
-              TitleAdd(firstLabel: 'My Room', AddLabel: 'Add Rooms'),
+                TitleAdd(
+                  firstLabel: 'My Room', 
+                  AddLabel: 'Add Rooms',
+                  onTap: () {
+                    context.push('/RoomList');
+                    
+                
+                  },
+                ),
               SizedBox(height: 15),
               Column(
                 spacing: 15,
