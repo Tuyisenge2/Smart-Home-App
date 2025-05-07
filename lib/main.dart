@@ -12,9 +12,20 @@ import 'package:new_app/pages/room_manage/room_details.dart';
 import 'package:new_app/pages/room_manage/room_single_device.dart';
 import 'package:new_app/pages/scene/create_scene.dart';
 import 'package:new_app/pages/signup.dart' show Signup;
+import 'package:new_app/provider/user_provider.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(MyApp());
+  // runApp(MyApp());
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => UserProvider()),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -34,8 +45,10 @@ class MyApp extends StatelessWidget {
       GoRoute(path: '/createScene', builder: (context, state) => CreateScene()),
       GoRoute(path: '/device', builder: (context, state) => deviceManagement()),
       GoRoute(path: '/roomDetail', builder: (context, state) => RoomDetails()),
-      GoRoute(path: '/roomDeviceDetail', builder: (context, state) => RoomSingleDevice()),
-
+      GoRoute(
+        path: '/roomDeviceDetail',
+        builder: (context, state) => RoomSingleDevice(),
+      ),
     ],
   );
 

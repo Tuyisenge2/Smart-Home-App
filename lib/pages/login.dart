@@ -5,10 +5,23 @@ import 'package:new_app/components/back_button.dart';
 import 'package:new_app/components/forget_button.dart';
 import 'package:new_app/components/input_field.dart';
 import 'package:new_app/components/responsive_text.dart';
+import 'package:new_app/provider/user_provider.dart';
+import 'package:provider/provider.dart';
+class Login extends StatefulWidget {
+ const Login({Key? key}) : super(key: key);
 
-class Login extends StatelessWidget {
+  @override
+  State<Login> createState() => loginScreen();
+}
+
+
+class loginScreen  extends State<Login> {
   @override
   Widget build(BuildContext context) {
+  //  var userName=context.watch<UserProvider>().userName;
+   String userName =Provider.of<UserProvider>(context, listen: false).userName;
+    print("Login page build method calleeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeed");
+    print("User name is $userName");
     return Container(
       width: double.infinity,
       height: double.infinity,
