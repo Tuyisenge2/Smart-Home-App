@@ -16,7 +16,7 @@ class DashHome extends StatelessWidget {
     String userName =Provider.of<UserProvider>(context,listen:false).userName;
                                                                     
     print("User name is $userName");
-    print("user name is eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee $userName");
+  
     return SizedBox(
       height: double.infinity,
       width: double.infinity,
