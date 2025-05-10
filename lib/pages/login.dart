@@ -6,8 +6,10 @@ import 'package:new_app/components/forget_button.dart';
 //import 'package:new_app/components/input_field.dart';
 import 'package:new_app/components/responsive_text.dart';
 import 'package:new_app/models/user_login_response.dart';
-import 'package:new_app/provider/user_provider.dart';
+import 'package:new_app/provider/is_user_auth_provider.dart';
+//import 'package:new_app/provider/user_provider.dart';
 import 'package:new_app/services/login_service.dart';
+import 'package:new_app/services/prefs.dart';
 import 'package:provider/provider.dart';
 
 class Login extends StatefulWidget {
@@ -18,18 +20,16 @@ class Login extends StatefulWidget {
 }
 
 class loginScreen extends State<Login> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+  // final TextEditingController _emailController = TextEditingController();
+  // final TextEditingController _passwordController = TextEditingController();
   String email = '';
   String password = '';
   Future<UserLoginResponse>? futureLogin;
   @override
   Widget build(BuildContext context) {
     //  var userName=context.watch<UserProvider>().userName;
-    String userName =
-        Provider.of<UserProvider>(context, listen: false).userName;
-
-    print("User nameeeeeeeeee and gggggggggggggggggfgg is $futureLogin");
+    //  String userName =Provider.of<UserProvider>(context, listen: false).userName;
+   // String token = Provider.of<IsUserAuthProvider>(context).token;
     return Container(
       width: double.infinity,
       height: double.infinity,
@@ -105,21 +105,9 @@ class loginScreen extends State<Login> {
                       ),
                     ),
                     SizedBox(height: 20),
-                    InputField(
-                      400,
-                      'Email',
-                      Colors.white,
-                      _emailController,
-                      'email',
-                    ),
+                    InputField(400, 'Email', Colors.white, 'email'),
                     SizedBox(height: 10),
-                    InputField(
-                      400,
-                      'Password',
-                      Colors.white,
-                      _passwordController,
-                      'password',
-                    ),
+                    InputField(400, 'Password', Colors.white, 'password'),
 
                     SizedBox(height: 20),
                     SizedBox(
@@ -127,11 +115,39 @@ class loginScreen extends State<Login> {
                       width: 400,
                       child: TextButton(
                         onPressed: () async {
-                          final response = await loginUser(email, password);
-                          print(
-                            "Future loginnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn is ${response.access_token}",
-                          );
-                          //   context.push('/dashboard');
+                          try {
+                            final response = await loginUser(email, password);
+                            if (response.access_token != null &&
+                                response.access_token.isNotEmpty) {
+                              // Update provider with new token
+                              context.read<IsUserAuthProvider>().setToken(
+                                response.access_token,
+                              );
+                              upDatePrefs('token', response.access_token);
+                              // Navigate to dashboard - no need for condition since we know we have a token
+                              context.push('/dashboard');
+
+                              print(
+                                "Login successful with token: ${response.access_token}",
+                              );
+                            } else {
+                              // Handle failed login
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Login failed - no token received',
+                                  ),
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            // Handle errors
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Login error: ${e.toString()}'),
+                              ),
+                            );
+                          }
                         },
                         style: TextButton.styleFrom(
                           backgroundColor: Colors.green,
@@ -250,7 +266,6 @@ class loginScreen extends State<Login> {
     double width,
     String hint,
     Color inputColor,
-    TextEditingController? controller,
     String input,
   ) {
     return ConstrainedBox(

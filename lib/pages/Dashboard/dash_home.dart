@@ -7,16 +7,19 @@ import 'package:new_app/components/plus_button.dart';
 import 'package:new_app/components/rooms_component.dart';
 import 'package:new_app/components/scene_card.dart';
 import 'package:new_app/components/title_add.dart';
+import 'package:new_app/provider/is_user_auth_provider.dart';
 import 'package:new_app/provider/user_provider.dart';
 import 'package:provider/provider.dart';
 
 class DashHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    String userName =Provider.of<UserProvider>(context,listen:false).userName;
-                                                                    
+    String userName =
+        Provider.of<UserProvider>(context, listen: false).userName;
+    String myToken = Provider.of<IsUserAuthProvider>(context).token;
+    print("Token is $myToken");
     print("User name is $userName");
-  
+
     return SizedBox(
       height: double.infinity,
       width: double.infinity,

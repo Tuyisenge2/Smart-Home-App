@@ -12,6 +12,8 @@ import 'package:new_app/pages/room_manage/room_details.dart';
 import 'package:new_app/pages/room_manage/room_single_device.dart';
 import 'package:new_app/pages/scene/create_scene.dart';
 import 'package:new_app/pages/signup.dart' show Signup;
+import 'package:new_app/provider/is_user_auth_provider.dart';
+import 'package:new_app/provider/scene_provider.dart';
 import 'package:new_app/provider/user_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -22,6 +24,8 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => UserProvider()),
+        ChangeNotifierProvider(create: (context) => IsUserAuthProvider()),
+        ChangeNotifierProvider(create: (context) => SceneProvider()),
       ],
       child: MyApp(),
     ),

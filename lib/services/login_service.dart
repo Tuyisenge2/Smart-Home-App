@@ -20,7 +20,6 @@ Future<UserLoginResponse> loginUser(String email, String Password) async {
     
       return UserLoginResponse.fromJson(jsonDecode(response.body));
     } else if (response.statusCode == 200) {
-      print('22222222222222222222222222222222222222222222: ${response.body}');
 
          final jsonData = jsonDecode(response.body);
       return UserLoginResponse.fromJson(
@@ -28,7 +27,6 @@ Future<UserLoginResponse> loginUser(String email, String Password) async {
       );
     } 
     else {
-      print('3333333333333333333333333333333333333333333333: ${response.body}');
       throw Exception('Failed to load user login response');
     }
   } catch (e) {
