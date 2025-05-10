@@ -6,6 +6,12 @@ import 'package:new_app/components/customizedButton.dart';
 import 'package:new_app/components/input_field.dart';
 import 'package:new_app/components/scene_card.dart';
 import 'package:new_app/components/times_button.dart';
+import 'package:new_app/models/fetch_scene_response.dart';
+import 'package:new_app/provider/is_user_auth_provider.dart';
+import 'package:new_app/provider/scene_provider.dart';
+import 'package:new_app/services/fetch_service.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CreateScene extends StatefulWidget {
   @override
@@ -13,6 +19,35 @@ class CreateScene extends StatefulWidget {
 }
 
 class _CreateScene extends State<CreateScene> {
+  dynamic backendRes;
+
+  @override
+  void initState() {
+    super.initState();
+    getSceneData();
+  }
+
+  void getSceneData() async {
+    try {
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      String? token = pref.getString('token');
+      //  String token = Provider.of<IsUserAuthProvider>(context).token;
+      SceneListResponse response = await fetchScenes(token!);
+
+      // print(
+      //   'weoknion ngajrnine nab vikiiiiiiiiiiiiiiiiiiiiionerficrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrerf ${response}',
+      // );
+
+      // setState(() {
+      //   backendRes = response.scenes;
+      // });
+
+      context.read<SceneProvider>().setSceneData(response.scenes);
+    } catch (e) {
+      print('Error fetching scene data: mana $e');
+    }
+  }
+
   Container circleDays(String l) {
     return Container(
       height: 35,
@@ -109,7 +144,7 @@ class _CreateScene extends State<CreateScene> {
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      border: Border.all(width: 2, color: Color(0xFFB9F249) ),
+                      border: Border.all(width: 2, color: Color(0xFFB9F249)),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -184,6 +219,7 @@ class _CreateScene extends State<CreateScene> {
       barrierColor: Colors.transparent,
       backgroundColor: Color(0xFF31373C),
       context: context,
+      isScrollControlled: true,
       builder: (BuildContext context) {
         return Container(
           padding: EdgeInsets.only(
@@ -191,7 +227,7 @@ class _CreateScene extends State<CreateScene> {
             left: MediaQuery.of(context).size.width * 0.03,
             right: MediaQuery.of(context).size.width * 0.03,
           ),
-          height: MediaQuery.of(context).size.height * 0.8,
+          height: MediaQuery.of(context).size.height * 0.65,
           width: double.infinity,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -290,6 +326,101 @@ class _CreateScene extends State<CreateScene> {
                     ),
                     Flexible(
                       child: SvgPicture.asset('assets/icons/toggleButton.svg'),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: MediaQuery.of(context).size.width * 0.03,
+                ),
+                height: 70,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Color(0xFF181D23),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Start Time',
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                        ),
+                        Text(
+                          'End Time',
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          'From',
+                          style: TextStyle(fontSize: 15, color: Colors.white),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.03,
+                        ),
+                        Text(
+                          '12.00',
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: Color(0xFFB9F249),
+                          ),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.01,
+                        ),
+                        Text(
+                          'AM',
+                          style: TextStyle(fontSize: 15, color: Colors.white),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.01,
+                        ),
+                        SvgPicture.asset(
+                          'assets/icons/dropDown.svg',
+                          height: 7,
+                          width: 7,
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.12,
+                        ),
+                        Text(
+                          'To',
+                          style: TextStyle(fontSize: 15, color: Colors.white),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.12,
+                        ),
+                        Text(
+                          '12.00',
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: Color(0xFFB9F249),
+                          ),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.01,
+                        ),
+                        Text(
+                          'AM',
+                          style: TextStyle(fontSize: 15, color: Colors.white),
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.01,
+                        ),
+                        SvgPicture.asset(
+                          'assets/icons/dropDown.svg',
+                          height: 7,
+                          width: 7,
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -583,6 +714,12 @@ class _CreateScene extends State<CreateScene> {
 
   @override
   Widget build(BuildContext context) {
+    //  var userName=context.watch<UserProvider>().userName;
+    dynamic sceneData = context.watch<SceneProvider>().sceneData;
+    print(
+      'oiurb8ybu8iueheiheihenriuuuuuuuuuuuuuuuuuuuuuuuuuuuiiiiiiiiiiiiiiierrrrrrrrrrreksnsussssssssssssskmmwwewwwwwwwwwwwwwwwww ${sceneData[2]}',
+    );
+
     return Scaffold(
       backgroundColor: Colors.white.withOpacity(.1),
       body: SizedBox(
@@ -630,6 +767,7 @@ class _CreateScene extends State<CreateScene> {
                     ),
                   ),
                   SizedBox(height: 20),
+
                   Container(
                     padding: EdgeInsets.all(4),
                     decoration: BoxDecoration(
@@ -652,6 +790,7 @@ class _CreateScene extends State<CreateScene> {
                       ],
                     ),
                   ),
+
                   Spacer(),
                   Customizedbutton(
                     label: 'Create yourScene',
@@ -661,6 +800,18 @@ class _CreateScene extends State<CreateScene> {
                   ),
                 ],
               ),
+
+              // ListView.builder(
+              //   itemCount: sceneData.length,
+              //   itemBuilder: (context, index) {
+              //     final currentScene = sceneData[index];
+              //     return SceneCard(
+              //       sceneMess: currentScene.name,
+              //       iconPath: 'assets/icons/sun.svg',
+              //       togglePath: 'assets/icons/toggleButton.svg',
+              //     );
+              //   },
+              // ),
             ),
           ),
         ),
@@ -668,3 +819,80 @@ class _CreateScene extends State<CreateScene> {
     );
   }
 }
+
+
+
+
+
+// return Scaffold(
+//   backgroundColor: Colors.white.withOpacity(.1),
+//   body: SizedBox(
+//     height: double.infinity,
+//     width: double.infinity,
+//     child: FractionallySizedBox(
+//       widthFactor: 0.9,
+//       child: ListView(
+//         padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.05),
+//         children: [
+//           // Your header widgets (back button, title)
+//           InkWell(
+//             onTap: () => Navigator.of(context).pop(),
+//             child: Container(
+//               height: 40,
+//               width: 40,
+//               padding: EdgeInsets.all(10),
+//               decoration: BoxDecoration(
+//                 color: Colors.white.withOpacity(0.2),
+//                 borderRadius: BorderRadius.circular(40),
+//               ),
+//               child: SvgPicture.asset(
+//                 "assets/icons/greaterThan.svg",
+//                 fit: BoxFit.contain,
+//               ),
+//             ),
+//           ),
+//           SizedBox(height: 20),
+//           Padding(
+//             padding: EdgeInsets.only(left: 10),
+//             child: Text(
+//               "Scene",
+//               style: TextStyle(
+//                 color: Colors.white,
+//                 fontSize: 24,
+//                 fontWeight: FontWeight.w800,
+//               ),
+//             ),
+//           ),
+//           SizedBox(height: 20),
+          
+//           // Your ListView.builder wrapped in a Container with fixed height
+//           Container(
+//             height: MediaQuery.of(context).size.height * 0.6, // Adjust as needed
+//             child: ListView.builder(
+//               itemCount: sceneData.length,
+//               itemBuilder: (context, index) {
+//                 final currentScene = sceneData[index];
+//                 return SceneCard(
+//                   sceneMess: currentScene.name,
+//                   iconPath: currentScene.name.toLowerCase().contains('morning')
+//                       ? 'assets/icons/sun.svg'
+//                       : 'assets/icons/moon.svg',
+//                   togglePath: 'assets/icons/toggleButton.svg',
+//                   isActive: currentScene.is_active,
+//                 );
+//               },
+//             ),
+//           ),
+          
+//           // Your button at the bottom
+//           Customizedbutton(
+//             label: 'Create yourScene',
+//             labelColor: Colors.black,
+//             buttonColor: Color(0xFFB9F249),
+//             bottomModal: bottomModal,
+//           ),
+//         ],
+//       ),
+//     ),
+//   ),
+// );

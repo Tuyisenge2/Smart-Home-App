@@ -37,7 +37,6 @@ class NavBar extends StatelessWidget {
             Flexible(
               child: InkWell(
                 onTap: () {
-                  print("hey");
                 },
                 child: Container(
                   height: 39,

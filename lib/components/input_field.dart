@@ -4,12 +4,14 @@ class InputField extends StatelessWidget {
   final double width;
   final String hint;
   final Color inputColor;
+   final TextEditingController? controller; 
 
   const InputField({
     super.key,
     required this.width,
     required this.hint,
     required this.inputColor,
+    this.controller,
   });
   @override
   Widget build(BuildContext context) {
