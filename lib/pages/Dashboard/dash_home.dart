@@ -7,11 +7,42 @@ import 'package:new_app/components/plus_button.dart';
 import 'package:new_app/components/rooms_component.dart';
 import 'package:new_app/components/scene_card.dart';
 import 'package:new_app/components/title_add.dart';
+import 'package:new_app/models/fetch_scene_response.dart';
 import 'package:new_app/provider/is_user_auth_provider.dart';
+import 'package:new_app/provider/scene_provider.dart';
 import 'package:new_app/provider/user_provider.dart';
+import 'package:new_app/services/fetch_service.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class DashHome extends StatelessWidget {
+class DashHome extends StatefulWidget {
+  DashHome({super.key});
+  @override
+  _DashHomeState createState() => _DashHomeState();
+}
+
+class _DashHomeState extends State<DashHome> {
+  @override
+  void initState() {
+    super.initState();
+    getSceneData();
+  }
+
+  void getSceneData() async {
+    try {
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      String? token = pref.getString('token');
+      dynamic sceneData = context.read<SceneProvider>().sceneData;
+      if (token != null) {
+        SceneListResponse response = await fetchScenes(token);
+        context.read<SceneProvider>().setSceneData(response.scenes);
+      }
+    } catch (e) {
+      print('Error fetching scene data: mana $e');
+      context.push('/Login');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     String userName =
@@ -19,6 +50,8 @@ class DashHome extends StatelessWidget {
     String myToken = Provider.of<IsUserAuthProvider>(context).token;
     print("Token is $myToken");
     print("User name is $userName");
+
+    dynamic sceneData = context.watch<SceneProvider>().sceneData;
 
     return SizedBox(
       height: double.infinity,
@@ -339,27 +372,29 @@ class DashHome extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 10),
-
               Container(
-                padding: EdgeInsets.all(4),
+                height: MediaQuery.of(context).size.height * 0.3,
+                padding: EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Column(
-                  spacing: 4,
-                  children: [
-                    SceneCard(
-                      sceneMess: 'Morning scene',
-                      iconPath: 'assets/icons/sun.svg',
-                      togglePath: 'assets/icons/toggleButton.svg',
-                    ),
-                    SceneCard(
-                      sceneMess: 'Night scene',
-                      iconPath: 'assets/icons/moon.svg',
-                      togglePath: 'assets/icons/toggleButton.svg',
-                    ),
-                  ],
+                child: ListView.builder(
+                  itemCount: 3,
+                  itemBuilder: (context, index) {
+                    final currentScene = sceneData[index];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 4.0),
+                      child: SceneCard(
+                        sceneMess: currentScene.name,
+                        iconPath:
+                            currentScene.name.toLowerCase().contains('morning')
+                                ? 'assets/icons/sun.svg'
+                                : 'assets/icons/moon.svg',
+                        togglePath: 'assets/icons/toggleButton.svg',
+                      ),
+                    );
+                  },
                 ),
               ),
 

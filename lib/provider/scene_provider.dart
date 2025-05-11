@@ -1,11 +1,12 @@
-
 import 'package:flutter/material.dart';
 
 class SceneProvider extends ChangeNotifier {
-  dynamic _sceneData;
+  List<dynamic> _sceneData = [];
+  bool isLoading = true;
   dynamic get sceneData => _sceneData;
-  void setSceneData(dynamic sceneData){
-    _sceneData=sceneData;
+  void setSceneData(dynamic sceneData) {
+    _sceneData = sceneData;
+    isLoading = false;
     notifyListeners();
   }
 }

@@ -31,18 +31,16 @@ class _CreateScene extends State<CreateScene> {
     try {
       SharedPreferences pref = await SharedPreferences.getInstance();
       String? token = pref.getString('token');
-      //  String token = Provider.of<IsUserAuthProvider>(context).token;
-      SceneListResponse response = await fetchScenes(token!);
 
-      // print(
-      //   'weoknion ngajrnine nab vikiiiiiiiiiiiiiiiiiiiiionerficrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrerf ${response}',
-      // );
+      dynamic sceneData = context.read<SceneProvider>().sceneData;
 
-      // setState(() {
-      //   backendRes = response.scenes;
-      // });
-
-      context.read<SceneProvider>().setSceneData(response.scenes);
+      if (token != null) {
+        SceneListResponse response = await fetchScenes(token);
+        // print(
+        //   'weoknion ngajrnine nab vikiiiiiiiiiiiiiiiiiiiiionerficrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrerf ${response}',
+        // );
+        context.read<SceneProvider>().setSceneData(response.scenes);
+      }
     } catch (e) {
       print('Error fetching scene data: mana $e');
     }
@@ -714,12 +712,17 @@ class _CreateScene extends State<CreateScene> {
 
   @override
   Widget build(BuildContext context) {
-    //  var userName=context.watch<UserProvider>().userName;
     dynamic sceneData = context.watch<SceneProvider>().sceneData;
-    print(
-      'oiurb8ybu8iueheiheihenriuuuuuuuuuuuuuuuuuuuuuuuuuuuiiiiiiiiiiiiiiierrrrrrrrrrreksnsussssssssssssskmmwwewwwwwwwwwwwwwwwww ${sceneData[2]}',
-    );
-
+    bool isLoading =
+        Provider.of<SceneProvider>(context, listen: false).isLoading;
+    if (isLoading) {
+      return Scaffold(
+        backgroundColor: Colors.white.withOpacity(.1),
+        body: Center(
+          child: CircularProgressIndicator(color: Color(0xFFB9F249)),
+        ),
+      );
+    }
     return Scaffold(
       backgroundColor: Colors.white.withOpacity(.1),
       body: SizedBox(
@@ -767,30 +770,33 @@ class _CreateScene extends State<CreateScene> {
                     ),
                   ),
                   SizedBox(height: 20),
-
                   Container(
-                    padding: EdgeInsets.all(4),
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    padding: EdgeInsets.all(6),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Column(
-                      spacing: 4,
-                      children: [
-                        SceneCard(
-                          sceneMess: 'Morning scene',
-                          iconPath: 'assets/icons/sun.svg',
-                          togglePath: 'assets/icons/toggleButton.svg',
-                        ),
-                        SceneCard(
-                          sceneMess: 'Night scene',
-                          iconPath: 'assets/icons/moon.svg',
-                          togglePath: 'assets/icons/toggleButton.svg',
-                        ),
-                      ],
+                    child: ListView.builder(
+                      itemCount: sceneData.length,
+                      itemBuilder: (context, index) {
+                        final currentScene = sceneData[index];
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 4.0),
+                          child: SceneCard(
+                            sceneMess: currentScene.name,
+                            iconPath:
+                                currentScene.name.toLowerCase().contains(
+                                      'morning',
+                                    )
+                                    ? 'assets/icons/sun.svg'
+                                    : 'assets/icons/moon.svg',
+                            togglePath: 'assets/icons/toggleButton.svg',
+                          ),
+                        );
+                      },
                     ),
                   ),
-
                   Spacer(),
                   Customizedbutton(
                     label: 'Create yourScene',
@@ -800,18 +806,6 @@ class _CreateScene extends State<CreateScene> {
                   ),
                 ],
               ),
-
-              // ListView.builder(
-              //   itemCount: sceneData.length,
-              //   itemBuilder: (context, index) {
-              //     final currentScene = sceneData[index];
-              //     return SceneCard(
-              //       sceneMess: currentScene.name,
-              //       iconPath: 'assets/icons/sun.svg',
-              //       togglePath: 'assets/icons/toggleButton.svg',
-              //     );
-              //   },
-              // ),
             ),
           ),
         ),
@@ -819,80 +813,3 @@ class _CreateScene extends State<CreateScene> {
     );
   }
 }
-
-
-
-
-
-// return Scaffold(
-//   backgroundColor: Colors.white.withOpacity(.1),
-//   body: SizedBox(
-//     height: double.infinity,
-//     width: double.infinity,
-//     child: FractionallySizedBox(
-//       widthFactor: 0.9,
-//       child: ListView(
-//         padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.05),
-//         children: [
-//           // Your header widgets (back button, title)
-//           InkWell(
-//             onTap: () => Navigator.of(context).pop(),
-//             child: Container(
-//               height: 40,
-//               width: 40,
-//               padding: EdgeInsets.all(10),
-//               decoration: BoxDecoration(
-//                 color: Colors.white.withOpacity(0.2),
-//                 borderRadius: BorderRadius.circular(40),
-//               ),
-//               child: SvgPicture.asset(
-//                 "assets/icons/greaterThan.svg",
-//                 fit: BoxFit.contain,
-//               ),
-//             ),
-//           ),
-//           SizedBox(height: 20),
-//           Padding(
-//             padding: EdgeInsets.only(left: 10),
-//             child: Text(
-//               "Scene",
-//               style: TextStyle(
-//                 color: Colors.white,
-//                 fontSize: 24,
-//                 fontWeight: FontWeight.w800,
-//               ),
-//             ),
-//           ),
-//           SizedBox(height: 20),
-          
-//           // Your ListView.builder wrapped in a Container with fixed height
-//           Container(
-//             height: MediaQuery.of(context).size.height * 0.6, // Adjust as needed
-//             child: ListView.builder(
-//               itemCount: sceneData.length,
-//               itemBuilder: (context, index) {
-//                 final currentScene = sceneData[index];
-//                 return SceneCard(
-//                   sceneMess: currentScene.name,
-//                   iconPath: currentScene.name.toLowerCase().contains('morning')
-//                       ? 'assets/icons/sun.svg'
-//                       : 'assets/icons/moon.svg',
-//                   togglePath: 'assets/icons/toggleButton.svg',
-//                   isActive: currentScene.is_active,
-//                 );
-//               },
-//             ),
-//           ),
-          
-//           // Your button at the bottom
-//           Customizedbutton(
-//             label: 'Create yourScene',
-//             labelColor: Colors.black,
-//             buttonColor: Color(0xFFB9F249),
-//             bottomModal: bottomModal,
-//           ),
-//         ],
-//       ),
-//     ),
-//   ),
-// );

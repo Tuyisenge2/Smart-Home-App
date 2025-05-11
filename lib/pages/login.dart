@@ -11,6 +11,7 @@ import 'package:new_app/provider/is_user_auth_provider.dart';
 import 'package:new_app/services/login_service.dart';
 import 'package:new_app/services/prefs.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -29,7 +30,7 @@ class loginScreen extends State<Login> {
   Widget build(BuildContext context) {
     //  var userName=context.watch<UserProvider>().userName;
     //  String userName =Provider.of<UserProvider>(context, listen: false).userName;
-   // String token = Provider.of<IsUserAuthProvider>(context).token;
+    // String token = Provider.of<IsUserAuthProvider>(context).token;
     return Container(
       width: double.infinity,
       height: double.infinity,
