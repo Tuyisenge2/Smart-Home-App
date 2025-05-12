@@ -3,14 +3,28 @@ import 'package:flutter_svg/svg.dart' show SvgPicture;
 import 'package:go_router/go_router.dart';
 import 'package:new_app/components/back_button.dart';
 import 'package:new_app/components/forget_button.dart';
-import 'package:new_app/components/input_field.dart';
+//import 'package:new_app/components/input_field.dart';
 import 'package:new_app/components/responsive_text.dart';
+import 'package:new_app/services/create_service.dart';
+import 'package:new_app/util/snack_bar.dart';
 
-class Signup extends StatelessWidget {
+class Signup extends StatefulWidget {
+  @override
+  _SignupState createState() => _SignupState();
+}
+
+class _SignupState extends State<Signup> {
+  String email = '';
+  String password = '';
+  String name = '';
+  String confirmPassword = '';
+
   @override
   Widget build(BuildContext context) {
     return Container(
       //  padding: EdgeInsets.only(left: 25, top: 65, right: 25),
+      width: double.infinity,
+      height: double.infinity,
       decoration: BoxDecoration(
         image: DecorationImage(
           image: AssetImage('assets/images/greenPlant.jpg'),
@@ -31,7 +45,6 @@ class Signup extends StatelessWidget {
             widthFactor: 0.9,
             child: SingleChildScrollView(
               child: SizedBox(
-                height: MediaQuery.of(context).size.height,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -82,31 +95,51 @@ class Signup extends StatelessWidget {
                     ),
                     SizedBox(height: 20),
 
-                    InputField(
-                      width: 400,
-                      hint: 'Name',
-                      inputColor: Colors.white,
-                    ),
+                    InputField(400, 'Name', Colors.white, 'name'),
+                    SizedBox(height: 10),
+
+                    InputField(400, 'Email', Colors.white, 'email'),
+                    SizedBox(height: 10),
+
+                    InputField(400, 'Password', Colors.white, 'password'),
                     SizedBox(height: 10),
 
                     InputField(
-                      width: 400,
-                      hint: 'Email',
-                      inputColor: Colors.white,
-                    ),
-                    SizedBox(height: 10),
-
-                    InputField(
-                      width: 400,
-                      hint: 'Password',
-                      inputColor: Colors.white,
+                      400,
+                      ' Confirm_Password',
+                      Colors.white,
+                      'confirmPassword',
                     ),
                     SizedBox(height: 20),
                     SizedBox(
                       height: 47,
                       width: 400,
                       child: TextButton(
-                        onPressed: () {},
+                        onPressed: () async {
+                          try {
+                            final response = await signupUser(
+                              email,
+                              password,
+                              confirmPassword,
+                              name,
+                            );
+                            if (response['status'] == true) {
+                              showTopSnackBar(
+                                context,
+                                'Registration successful!',
+                                Colors.green,
+                              );
+                              context.push('/Login');
+                            }
+                          } catch (e) {
+                            print('Error signing up: $e');
+                            showTopSnackBar(
+                              context,
+                              'Registration Failed!',
+                              Colors.red,
+                            );
+                          }
+                        },
                         style: TextButton.styleFrom(
                           backgroundColor: Colors.green,
                           shape: RoundedRectangleBorder(
@@ -216,6 +249,41 @@ class Signup extends StatelessWidget {
                 ),
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  ConstrainedBox InputField(
+    double width,
+    String hint,
+    Color inputColor,
+    String input,
+  ) {
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: width),
+      child: TextField(
+        onChanged: (value) {
+          setState(() {
+            if (input == 'email') {
+              email = value;
+            } else if (input == 'password') {
+              password = value;
+            } else if (input == 'confirmPassword') {
+              confirmPassword = value;
+            } else if (input == 'name') {
+              name = value;
+            }
+          });
+        },
+        decoration: InputDecoration(
+          hintText: hint,
+          fillColor: inputColor,
+          filled: true,
+          border: OutlineInputBorder(
+            borderSide: BorderSide(color: inputColor),
+            borderRadius: BorderRadius.all(Radius.circular(8)),
           ),
         ),
       ),

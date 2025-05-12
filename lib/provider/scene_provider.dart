@@ -5,7 +5,7 @@ class SceneProvider extends ChangeNotifier {
   bool isLoading = true;
   dynamic get sceneData => _sceneData;
   void setSceneData(dynamic sceneData) {
-    _sceneData = sceneData;
+    _sceneData = sceneData ?? [];
     isLoading = false;
     notifyListeners();
   }

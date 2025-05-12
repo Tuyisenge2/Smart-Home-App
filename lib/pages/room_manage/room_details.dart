@@ -116,13 +116,19 @@ class RoomDetails extends StatelessWidget {
                           onTap: () {
                             context.push('/roomDeviceDetail');
                           },
-                          child: DeviceCard(),
+                          child: DeviceCard(
+                            name: 'Air Conditioner',
+                            imageUrl: 'assets/images/AirCond.png',
+                          ),
                         ),
                         InkWell(
                           onTap: () {
                             context.push('/roomDeviceDetail');
                           },
-                          child: DeviceCard(),
+                          child: DeviceCard(
+                            name: 'Smart TV',
+                            imageUrl: 'assets/images/AirCond.png',
+                          ),
                         ),
                       ],
                     ),
@@ -134,7 +140,16 @@ class RoomDetails extends StatelessWidget {
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [DeviceCard(), DeviceCard()],
+                      children: [
+                        DeviceCard(
+                          name: 'Smart TV',
+                          imageUrl: 'assets/images/AirCond.png',
+                        ),
+                        DeviceCard(
+                          name: 'Smart TV',
+                          imageUrl: 'assets/images/AirCond.png',
+                        ),
+                      ],
                     ),
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.02),
@@ -144,9 +159,19 @@ class RoomDetails extends StatelessWidget {
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [DeviceCard(), DeviceCard()],
+                      children: [
+                        DeviceCard(
+                          name: 'Smart TV',
+                          imageUrl: 'assets/images/AirCond.png',
+                        ),
+                        DeviceCard(
+                          name: 'Smart TV',
+                          imageUrl: 'assets/images/AirCond.png',
+                        ),
+                      ],
                     ),
                   ),
+
                   SizedBox(height: MediaQuery.of(context).size.height * 0.09),
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.9,

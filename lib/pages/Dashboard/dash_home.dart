@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
@@ -7,7 +9,9 @@ import 'package:new_app/components/plus_button.dart';
 import 'package:new_app/components/rooms_component.dart';
 import 'package:new_app/components/scene_card.dart';
 import 'package:new_app/components/title_add.dart';
+import 'package:new_app/models/fetch_device_response.dart';
 import 'package:new_app/models/fetch_scene_response.dart';
+import 'package:new_app/provider/device_provider.dart';
 import 'package:new_app/provider/is_user_auth_provider.dart';
 import 'package:new_app/provider/scene_provider.dart';
 import 'package:new_app/provider/user_provider.dart';
@@ -16,7 +20,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DashHome extends StatefulWidget {
-  DashHome({super.key});
+  const DashHome({super.key});
   @override
   _DashHomeState createState() => _DashHomeState();
 }
@@ -26,6 +30,7 @@ class _DashHomeState extends State<DashHome> {
   void initState() {
     super.initState();
     getSceneData();
+    getDevicesData();
   }
 
   void getSceneData() async {
@@ -33,13 +38,33 @@ class _DashHomeState extends State<DashHome> {
       SharedPreferences pref = await SharedPreferences.getInstance();
       String? token = pref.getString('token');
       dynamic sceneData = context.read<SceneProvider>().sceneData;
-      if (token != null) {
+      if (token != null && sceneData.isEmpty) {
         SceneListResponse response = await fetchScenes(token);
         context.read<SceneProvider>().setSceneData(response.scenes);
       }
     } catch (e) {
       print('Error fetching scene data: mana $e');
       context.push('/Login');
+    }
+  }
+
+  //not coming right now
+  void getDevicesData() async {
+    try {
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      String? token = pref.getString('token');
+      dynamic deviceData = context.read<DeviceProvider>().deviceData;
+
+      if (token != null && deviceData.isEmpty) {
+        DeviceListResponse response = await fetchDevice(token);
+        print(
+          '44444444444444444444444444444444444444444444444444444444 $response[0] ',
+        );
+        context.read<DeviceProvider>().setDeviceData(response.devices);
+      }
+    } catch (e) {
+      print('Error fetching device data: Error is $e');
+      //   context.push('/Login');
     }
   }
 
@@ -52,7 +77,10 @@ class _DashHomeState extends State<DashHome> {
     print("User name is $userName");
 
     dynamic sceneData = context.watch<SceneProvider>().sceneData;
-
+    dynamic deviceData = context.watch<DeviceProvider>().deviceData;
+    print(
+      '44444444444444444444444444444444444444444444444444444444 222222222222222222222222222222222222222222 $deviceData ',
+    );
     return SizedBox(
       height: double.infinity,
       width: double.infinity,
@@ -379,23 +407,40 @@ class _DashHomeState extends State<DashHome> {
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: ListView.builder(
-                  itemCount: 3,
-                  itemBuilder: (context, index) {
-                    final currentScene = sceneData[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 4.0),
-                      child: SceneCard(
-                        sceneMess: currentScene.name,
-                        iconPath:
-                            currentScene.name.toLowerCase().contains('morning')
-                                ? 'assets/icons/sun.svg'
-                                : 'assets/icons/moon.svg',
-                        togglePath: 'assets/icons/toggleButton.svg',
-                      ),
-                    );
-                  },
-                ),
+                child:
+                    sceneData.isEmpty
+                        ? SizedBox(
+                          width: double.infinity,
+                          child: Center(
+                            child: Text(
+                              'No Scene Found',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                              ),
+                            ),
+                          ),
+                        )
+                        : ListView.builder(
+                          itemCount: 3,
+                          itemBuilder: (context, index) {
+                            final currentScene = sceneData[index];
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 4.0),
+                              child: SceneCard(
+                                sceneMess: currentScene.name,
+                                iconPath:
+                                    currentScene.name.toLowerCase().contains(
+                                          'morning',
+                                        )
+                                        ? 'assets/icons/sun.svg'
+                                        : 'assets/icons/moon.svg',
+                                togglePath: 'assets/icons/toggleButton.svg',
+                                isActive: currentScene.is_active,
+                              ),
+                            );
+                          },
+                        ),
               ),
 
               SizedBox(height: 10),
@@ -413,14 +458,26 @@ class _DashHomeState extends State<DashHome> {
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [DeviceCard(), DeviceCard()],
+                    children:
+                     [
+                     
+                      DeviceCard(
+                        name: deviceData[0].Device_name,
+                        imageUrl: 'assets/images/AirCond.png',
+                      ),
+                      DeviceCard(
+                        name: deviceData[0].Device_name,
+                        imageUrl: 'assets/images/AirCond.png',
+                      ),
+                    ],
+
                   ),
                   SizedBox(height: 16),
 
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [DeviceCard2(), DeviceCard2()],
-                  ),
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //   children: [DeviceCard2(), DeviceCard2()],
+                  // ),
                 ],
               ),
               SizedBox(height: 20),

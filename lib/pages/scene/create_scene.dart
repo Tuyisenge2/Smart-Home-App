@@ -34,11 +34,9 @@ class _CreateScene extends State<CreateScene> {
 
       dynamic sceneData = context.read<SceneProvider>().sceneData;
 
-      if (token != null) {
+      if (token != null && sceneData.isEmpty) {
         SceneListResponse response = await fetchScenes(token);
-        // print(
-        //   'weoknion ngajrnine nab vikiiiiiiiiiiiiiiiiiiiiionerficrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrerf ${response}',
-        // );
+
         context.read<SceneProvider>().setSceneData(response.scenes);
       }
     } catch (e) {
@@ -777,25 +775,40 @@ class _CreateScene extends State<CreateScene> {
                       color: Colors.white.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: ListView.builder(
-                      itemCount: sceneData.length,
-                      itemBuilder: (context, index) {
-                        final currentScene = sceneData[index];
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 4.0),
-                          child: SceneCard(
-                            sceneMess: currentScene.name,
-                            iconPath:
-                                currentScene.name.toLowerCase().contains(
-                                      'morning',
-                                    )
-                                    ? 'assets/icons/sun.svg'
-                                    : 'assets/icons/moon.svg',
-                            togglePath: 'assets/icons/toggleButton.svg',
-                          ),
-                        );
-                      },
-                    ),
+                    child:
+                        sceneData.isEmpty
+                            ? SizedBox(
+                              width: double.infinity,
+                              child: Center(
+                                child: Text(
+                                  'No Scene Found',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                              ),
+                            )
+                            : ListView.builder(
+                              itemCount: sceneData.length,
+                              itemBuilder: (context, index) {
+                                final currentScene = sceneData[index];
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 4.0),
+                                  child: SceneCard(
+                                    sceneMess: currentScene.name,
+                                    iconPath:
+                                        currentScene.name
+                                                .toLowerCase()
+                                                .contains('morning')
+                                            ? 'assets/icons/sun.svg'
+                                            : 'assets/icons/moon.svg',
+                                    togglePath: 'assets/icons/toggleButton.svg',
+                                    isActive: currentScene.is_active,
+                                  ),
+                                );
+                              },
+                            ),
                   ),
                   Spacer(),
                   Customizedbutton(

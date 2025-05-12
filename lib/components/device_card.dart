@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class DeviceCard extends StatefulWidget {
-  const DeviceCard({super.key});
-
+  final String name;
+  final String imageUrl;
+  const DeviceCard({super.key, required this.name, required this.imageUrl});
   @override
   State<DeviceCard> createState() => _DeviceCardState();
 }
@@ -29,9 +30,10 @@ class _DeviceCardState extends State<DeviceCard> {
             padding: EdgeInsets.only(left: 140.0),
             child: InkWell(child: SvgPicture.asset('assets/icons/less2.svg')),
           ),
-          Image.asset('assets/images/AirCond.png'),
+          //    Image.asset( widget.imageUrl?? 'assets/images/AirCond.png'),
+          Image.asset(widget.imageUrl),
           Text(
-            "Air Conditioner",
+            widget.name,
             style: TextStyle(
               fontSize: 15,
               color: Colors.white,
