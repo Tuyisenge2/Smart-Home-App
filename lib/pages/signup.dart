@@ -138,7 +138,7 @@ class _SignupState extends State<Signup> {
                               'Registration Failed!',
                               Colors.red,
                             );
-                          }
+                          }                          
                         },
                         style: TextButton.styleFrom(
                           backgroundColor: Colors.green,

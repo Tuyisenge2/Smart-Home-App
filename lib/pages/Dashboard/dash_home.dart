@@ -57,9 +57,9 @@ class _DashHomeState extends State<DashHome> {
 
       if (token != null && deviceData.isEmpty) {
         DeviceListResponse response = await fetchDevice(token);
-        print(
-          '44444444444444444444444444444444444444444444444444444444 $response[0] ',
-        );
+        // print(
+        //   '44444444444444444444444444444444444444444444444444444444 $response[0] ',
+        // );
         context.read<DeviceProvider>().setDeviceData(response.devices);
       }
     } catch (e) {
@@ -78,9 +78,9 @@ class _DashHomeState extends State<DashHome> {
 
     dynamic sceneData = context.watch<SceneProvider>().sceneData;
     dynamic deviceData = context.watch<DeviceProvider>().deviceData;
-    print(
-      '44444444444444444444444444444444444444444444444444444444 222222222222222222222222222222222222222222 $deviceData ',
-    );
+    // print(
+    //   '44444444444444444444444444444444444444444444444444444444 222222222222222222222222222222222222222222 $deviceData ',
+    // );
     return SizedBox(
       height: double.infinity,
       width: double.infinity,
@@ -456,22 +456,51 @@ class _DashHomeState extends State<DashHome> {
               SizedBox(height: 10),
               Column(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children:
-                     [
-                     
-                      DeviceCard(
-                        name: deviceData[0].Device_name,
-                        imageUrl: 'assets/images/AirCond.png',
-                      ),
-                      DeviceCard(
-                        name: deviceData[0].Device_name,
-                        imageUrl: 'assets/images/AirCond.png',
-                      ),
-                    ],
+                  // Row(
+                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //   children: [
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.45,
 
+                    child: ListView.builder(
+                      itemCount: (deviceData.length / 2).ceil(),
+                      itemBuilder: (context, rowIndex) {
+                        final firstIndex = rowIndex * 2;
+                        return Padding(
+                          padding: EdgeInsets.only(bottom: 3),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              DeviceCard(
+                                name: deviceData[firstIndex].Device_name,
+                                imageUrl:
+                                    //     deviceData[firstIndex].images_url ??
+                                    'assets/images/AirCond.png',
+                              ),
+                              if (firstIndex + 1 < deviceData.length)
+                                DeviceCard(
+                                  name: deviceData[firstIndex + 1].Device_name,
+                                  imageUrl:
+                                      //    deviceData[firstIndex + 1].images_url ??
+                                      'assets/images/AirCond.png',
+                                ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
                   ),
+
+                  // DeviceCard(
+                  //   name: deviceData[0].Device_name,
+                  //   imageUrl: 'assets/images/AirCond.png',
+                  // ),
+                  // DeviceCard(
+                  //   name: deviceData[0].Device_name,
+                  //   imageUrl: 'assets/images/AirCond.png',
+                  // ),
+                  //  ],
+                  //),
                   SizedBox(height: 16),
 
                   // Row(

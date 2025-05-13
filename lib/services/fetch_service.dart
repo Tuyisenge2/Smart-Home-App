@@ -9,7 +9,9 @@ Future<SceneListResponse> fetchScenes(String token) async {
   try {
     final response = await http.get(
       Uri.parse('http://10.0.2.2:8000/api/scenes'),
-      headers: {HttpHeaders.authorizationHeader: "Bearer $token"},
+      headers: { 
+        HttpHeaders.authorizationHeader: "Bearer $token" 
+        },
     );
 
     // print('Status Code: ${response.statusCode}');

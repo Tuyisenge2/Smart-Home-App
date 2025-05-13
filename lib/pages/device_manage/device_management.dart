@@ -6,6 +6,9 @@ import 'package:new_app/components/device_card3.dart';
 import 'package:new_app/components/input_field.dart';
 import 'package:new_app/components/scene_card.dart';
 import 'package:new_app/components/times_button.dart';
+import 'package:new_app/services/create_service.dart';
+import 'package:new_app/util/snack_bar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class deviceManagement extends StatefulWidget {
   @override
@@ -13,6 +16,11 @@ class deviceManagement extends StatefulWidget {
 }
 
 class _deviceManagementState extends State<deviceManagement> {
+  String name = '';
+  int room_id = 0;
+  String images_url = '';
+  bool livRoom = false;
+
   Container circleDays(String l) {
     return Container(
       height: 35,
@@ -129,124 +137,136 @@ class _deviceManagementState extends State<deviceManagement> {
       backgroundColor: Color(0xFF31373C),
       context: context,
       builder: (BuildContext context) {
-        return Container(
-          padding: EdgeInsets.only(
-            top: MediaQuery.of(context).size.height * 0.01,
-            left: MediaQuery.of(context).size.width * 0.03,
-            right: MediaQuery.of(context).size.width * 0.03,
-          ),
-          height: MediaQuery.of(context).size.height * 0.8,
-          width: double.infinity,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Container(
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).size.height * 0.01,
+                left: MediaQuery.of(context).size.width * 0.03,
+                right: MediaQuery.of(context).size.width * 0.03,
+              ),
+              height: MediaQuery.of(context).size.height * 0.8,
+              width: double.infinity,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  TimesButton(
-                    height: 20,
-                    width: 20,
-                    callback: () {
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TimesButton(
+                        height: 20,
+                        width: 20,
+                        callback: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  ),
+                  Center(
+                    child: Text(
+                      "Select Room",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () {
+                      setModalState(() {
+                        livRoom = !livRoom;
+                        room_id = 1;
+                      });
+                    },
+                    child: Container(
+                      height: 50,
+                      width: 190,
+                      decoration: BoxDecoration(
+                        color: livRoom ? Color(0xFFB9F249) : Color(0xFF181D23),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Living Room',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  Container(
+                    height: 50,
+                    width: 190,
+                    decoration: BoxDecoration(
+                      color: Color(0xFF181D23),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Living Room',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: 50,
+                    width: 190,
+                    decoration: BoxDecoration(
+                      color: Color(0xFF181D23),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Bed Room',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: 50,
+                    width: 190,
+                    decoration: BoxDecoration(
+                      color: Color(0xFF181D23),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Kitchen',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  Customizedbutton(
+                    label: 'Continue',
+                    labelColor: Colors.black,
+                    buttonColor: Color(0xFFB9F249),
+                    bottomModal: () {
                       Navigator.of(context).pop();
+                      createSceneThirdModal();
                     },
                   ),
                 ],
               ),
-              Center(
-                child: Text(
-                  "Select Room",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              Container(
-                height: 50,
-                width: 190,
-                decoration: BoxDecoration(
-                  color: Color(0xFF181D23),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Center(
-                  child: Text(
-                    'Living Room',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-              ),
-
-              Container(
-                height: 50,
-                width: 190,
-                decoration: BoxDecoration(
-                  color: Color(0xFF181D23),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Center(
-                  child: Text(
-                    'Living Room',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                height: 50,
-                width: 190,
-                decoration: BoxDecoration(
-                  color: Color(0xFF181D23),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Center(
-                  child: Text(
-                    'Bed Room',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                height: 50,
-                width: 190,
-                decoration: BoxDecoration(
-                  color: Color(0xFF181D23),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Center(
-                  child: Text(
-                    'Kitchen',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-              ),
-
-              Customizedbutton(
-                label: 'Continue',
-                labelColor: Colors.black,
-                buttonColor: Color(0xFFB9F249),
-                bottomModal: () {
-                  Navigator.of(context).pop();
-                  createSceneThirdModal();
-                },
-              ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
@@ -318,6 +338,11 @@ class _deviceManagementState extends State<deviceManagement> {
                             Flexible(
                               flex: 8,
                               child: TextField(
+                                onChanged: (value) {
+                                  setState(() {
+                                    name = value;
+                                  });
+                                },
                                 decoration: InputDecoration(
                                   fillColor: Colors.white,
                                   filled: true,
@@ -359,9 +384,34 @@ class _deviceManagementState extends State<deviceManagement> {
                     label: 'Continue',
                     labelColor: Colors.black,
                     buttonColor: Color(0xFFB9F249),
-                    bottomModal: () {
-                      Navigator.of(context).pop();
-                      createSceneFoufthModal();
+                    bottomModal: () async {
+                      try {
+                        SharedPreferences pref =
+                            await SharedPreferences.getInstance();
+                        final token = pref.getString('token');
+                        final response = await createDevice(
+                          name,
+                          room_id,
+                          'ir67fy6r7',
+                          token!,
+                        );
+                        if (response['status'] == true) {
+                          showTopSnackBar(
+                            context,
+                            'Device created successful!',
+                            Colors.green,
+                          );
+                          Navigator.of(context).pop();
+                          createSceneFoufthModal(name);
+                        }
+                      } catch (e) {
+                        print('Error creating device: $e');
+                        showTopSnackBar(
+                          context,
+                          'Device creation Failed!',
+                          Colors.red,
+                        );
+                      }
                     },
                   ),
                 ],
@@ -373,7 +423,7 @@ class _deviceManagementState extends State<deviceManagement> {
     );
   }
 
-  void createSceneFoufthModal() {
+  void createSceneFoufthModal(String name) {
     showModalBottomSheet(
       barrierColor: Colors.transparent,
       backgroundColor: Color(0xFF31373C),
@@ -406,7 +456,7 @@ class _deviceManagementState extends State<deviceManagement> {
               Column(
                 children: [
                   Text(
-                    "Light Added to",
+                    "$name added to ",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 22,
