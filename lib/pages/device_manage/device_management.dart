@@ -2,12 +2,17 @@ import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:flutter_svg/svg.dart';
 import 'package:new_app/components/customizedButton.dart';
+import 'package:new_app/components/device_card.dart';
 import 'package:new_app/components/device_card3.dart';
 import 'package:new_app/components/input_field.dart';
 import 'package:new_app/components/scene_card.dart';
 import 'package:new_app/components/times_button.dart';
+import 'package:new_app/models/fetch_device_response.dart';
+import 'package:new_app/provider/device_provider.dart';
 import 'package:new_app/services/create_service.dart';
+import 'package:new_app/services/fetch_service.dart';
 import 'package:new_app/util/snack_bar.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class deviceManagement extends StatefulWidget {
@@ -20,6 +25,20 @@ class _deviceManagementState extends State<deviceManagement> {
   int room_id = 0;
   String images_url = '';
   bool livRoom = false;
+
+  void getDevicesData() async {
+    try {
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      String? token = pref.getString('token');
+      dynamic deviceData = context.read<DeviceProvider>().deviceData;
+      if (token != null) {
+        DeviceListResponse response = await fetchDevice(token);
+        context.read<DeviceProvider>().setDeviceData(response.devices);
+      }
+    } catch (e) {
+      print('Error fetching device data: Error is $e');
+    }
+  }
 
   Container circleDays(String l) {
     return Container(
@@ -396,12 +415,15 @@ class _deviceManagementState extends State<deviceManagement> {
                           token!,
                         );
                         if (response['status'] == true) {
+                          //   getDevicesData();
                           showTopSnackBar(
                             context,
                             'Device created successful!',
                             Colors.green,
                           );
                           Navigator.of(context).pop();
+                          // Force refresh devices
+                          getDevicesData();
                           createSceneFoufthModal(name);
                         }
                       } catch (e) {
@@ -500,6 +522,8 @@ class _deviceManagementState extends State<deviceManagement> {
 
   @override
   Widget build(BuildContext context) {
+    dynamic deviceData = context.watch<DeviceProvider>().deviceData;
+
     return Scaffold(
       backgroundColor: Colors.white.withOpacity(.1),
       body: SizedBox(
@@ -547,16 +571,41 @@ class _deviceManagementState extends State<deviceManagement> {
                     ),
                   ),
                   SizedBox(height: 20),
-                  Container(
-                    padding: EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [DeviceCard3(), DeviceCard3()],
-                    ),
+                  Column(
+                    children: [
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.45,
+                        child: ListView.builder(
+                          itemCount: (deviceData.length / 2).ceil(),
+                          itemBuilder: (context, rowIndex) {
+                            final firstIndex = rowIndex * 2;
+                            return Padding(
+                              padding: EdgeInsets.only(bottom: 3),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  DeviceCard(
+                                    name: deviceData[firstIndex].Device_name,
+                                    imageUrl: 'assets/images/AirCond.png',
+                                  ),
+                                  if (firstIndex + 1 < deviceData.length)
+                                    DeviceCard(
+                                      name:
+                                          deviceData[firstIndex + 1]
+                                              .Device_name,
+                                      imageUrl: 'assets/images/AirCond.png',
+                                    ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                    ],
                   ),
+
                   Spacer(),
                   Customizedbutton(
                     label: 'Add Device',

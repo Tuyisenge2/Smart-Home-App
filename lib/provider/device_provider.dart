@@ -9,4 +9,24 @@ class DeviceProvider extends ChangeNotifier {
     isLoading = false;
     notifyListeners();
   }
+
+ Future<void> fetchDevices() async {
+    try {
+      isLoading = true;
+      notifyListeners();
+      
+      // Call your API to get devices
+      // final response = await yourApiService.getDevices();
+      // _deviceData = response.data;
+      
+      isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      isLoading = false;
+      notifyListeners();
+      throw e;
+    }
+  }
+
+
 }

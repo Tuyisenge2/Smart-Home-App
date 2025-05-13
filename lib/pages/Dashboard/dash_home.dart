@@ -48,7 +48,7 @@ class _DashHomeState extends State<DashHome> {
     }
   }
 
-  //not coming right now
+  //
   void getDevicesData() async {
     try {
       SharedPreferences pref = await SharedPreferences.getInstance();
@@ -57,14 +57,10 @@ class _DashHomeState extends State<DashHome> {
 
       if (token != null && deviceData.isEmpty) {
         DeviceListResponse response = await fetchDevice(token);
-        // print(
-        //   '44444444444444444444444444444444444444444444444444444444 $response[0] ',
-        // );
         context.read<DeviceProvider>().setDeviceData(response.devices);
       }
     } catch (e) {
       print('Error fetching device data: Error is $e');
-      //   context.push('/Login');
     }
   }
 
@@ -454,14 +450,11 @@ class _DashHomeState extends State<DashHome> {
                 ),
               ),
               SizedBox(height: 10),
+
               Column(
                 children: [
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //   children: [
                   SizedBox(
                     height: MediaQuery.of(context).size.height * 0.45,
-
                     child: ListView.builder(
                       itemCount: (deviceData.length / 2).ceil(),
                       itemBuilder: (context, rowIndex) {
@@ -473,16 +466,12 @@ class _DashHomeState extends State<DashHome> {
                             children: [
                               DeviceCard(
                                 name: deviceData[firstIndex].Device_name,
-                                imageUrl:
-                                    //     deviceData[firstIndex].images_url ??
-                                    'assets/images/AirCond.png',
+                                imageUrl: 'assets/images/AirCond.png',
                               ),
                               if (firstIndex + 1 < deviceData.length)
                                 DeviceCard(
                                   name: deviceData[firstIndex + 1].Device_name,
-                                  imageUrl:
-                                      //    deviceData[firstIndex + 1].images_url ??
-                                      'assets/images/AirCond.png',
+                                  imageUrl: 'assets/images/AirCond.png',
                                 ),
                             ],
                           ),
@@ -490,25 +479,11 @@ class _DashHomeState extends State<DashHome> {
                       },
                     ),
                   ),
-
-                  // DeviceCard(
-                  //   name: deviceData[0].Device_name,
-                  //   imageUrl: 'assets/images/AirCond.png',
-                  // ),
-                  // DeviceCard(
-                  //   name: deviceData[0].Device_name,
-                  //   imageUrl: 'assets/images/AirCond.png',
-                  // ),
-                  //  ],
-                  //),
                   SizedBox(height: 16),
-
-                  // Row(
-                  //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //   children: [DeviceCard2(), DeviceCard2()],
-                  // ),
                 ],
               ),
+
+              
               SizedBox(height: 20),
               TitleAdd(firstLabel: 'My Room', AddLabel: 'Add Rooms'),
               SizedBox(height: 15),
