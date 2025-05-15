@@ -1,19 +1,18 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'dart:ui';
 import 'package:flutter_svg/svg.dart';
 import 'package:new_app/components/customizedButton.dart';
 import 'package:new_app/components/device_card.dart';
-import 'package:new_app/components/device_card3.dart';
-import 'package:new_app/components/input_field.dart';
-import 'package:new_app/components/scene_card.dart';
 import 'package:new_app/components/times_button.dart';
 import 'package:new_app/models/fetch_device_response.dart';
 import 'package:new_app/provider/device_provider.dart';
 import 'package:new_app/services/create_service.dart';
 import 'package:new_app/services/fetch_service.dart';
+import 'package:new_app/util/cloudinary_utils.dart';
 import 'package:new_app/util/snack_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:image_picker/image_picker.dart';
 
 class deviceManagement extends StatefulWidget {
   @override
@@ -21,11 +20,13 @@ class deviceManagement extends StatefulWidget {
 }
 
 class _deviceManagementState extends State<deviceManagement> {
+  CloudinaryUtils cloud = CloudinaryUtils();
   String name = '';
   int room_id = 0;
-  String images_url = '';
   bool livRoom = false;
-
+  File? _imageFile;
+  String images_url = '';
+  bool uploadImage = false;
   void getDevicesData() async {
     try {
       SharedPreferences pref = await SharedPreferences.getInstance();
@@ -88,63 +89,88 @@ class _deviceManagementState extends State<deviceManagement> {
       backgroundColor: Color(0xFF31373C),
       context: context,
       builder: (BuildContext context) {
-        return Container(
-          padding: EdgeInsets.only(
-            left: MediaQuery.of(context).size.width * 0.03,
-            right: MediaQuery.of(context).size.width * 0.03,
-          ),
-          height: MediaQuery.of(context).size.height * 0.4,
-          width: double.infinity,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Container(
+              padding: EdgeInsets.only(
+                left: MediaQuery.of(context).size.width * 0.03,
+                right: MediaQuery.of(context).size.width * 0.03,
+              ),
+              height: MediaQuery.of(context).size.height * 0.4,
+              width: double.infinity,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  TimesButton(
-                    height: 20,
-                    width: 20,
-                    callback: () {
-                      Navigator.of(context).pop();
-                    },
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TimesButton(
+                        height: 20,
+                        width: 20,
+                        callback: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
                   ),
+                  Center(
+                    child: Text(
+                      "Light",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 25,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+
+                  Container(
+                    width: 80,
+                    height: 80,
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    //
+                    child: SvgPicture.asset('assets/icons/sun.svg'),
+                  ),
+
+                  !uploadImage
+                      ? Customizedbutton(
+                        label: 'Select from Gallery',
+                        labelColor: Colors.black,
+                        buttonColor: Color(0xFFB9F249),
+                        bottomModal: () async {
+                          _imageFile = await cloud.pickImage(
+                            ImageSource.gallery,
+                          );
+                          setModalState(() {
+                            uploadImage = !uploadImage;
+                          });
+                        },
+                      )
+                      : Customizedbutton(
+                        label: 'Upload Image',
+                        labelColor: Colors.black,
+                        buttonColor: Color(0xFFB9F249),
+                        bottomModal: () async {
+                          images_url =
+                              await cloud.uploadImage(_imageFile!) ?? '';
+                          setModalState(() {
+                            uploadImage = !uploadImage;
+                          });
+                          Navigator.of(context).pop();
+                          Future.delayed(Duration(milliseconds: 300), () {
+                            creatSceneSecondModal();
+                          });
+                        },
+                      ),
                 ],
               ),
-              Center(
-                child: Text(
-                  "Light",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 25,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-
-              Container(
-                width: 80,
-                height: 80,
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(100),
-                ),
-                //
-                child: SvgPicture.asset('assets/icons/sun.svg'),
-              ),
-
-              Customizedbutton(
-                label: 'Continue',
-                labelColor: Colors.black,
-                buttonColor: Color(0xFFB9F249),
-                bottomModal: () {
-                  Navigator.of(context).pop();
-                  creatSceneSecondModal();
-                },
-              ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
@@ -411,11 +437,10 @@ class _deviceManagementState extends State<deviceManagement> {
                         final response = await createDevice(
                           name,
                           room_id,
-                          'ir67fy6r7',
+                          images_url,
                           token!,
                         );
                         if (response['status'] == true) {
-                          //   getDevicesData();
                           showTopSnackBar(
                             context,
                             'Device created successful!',
@@ -523,7 +548,9 @@ class _deviceManagementState extends State<deviceManagement> {
   @override
   Widget build(BuildContext context) {
     dynamic deviceData = context.watch<DeviceProvider>().deviceData;
-
+    // print(
+    //   '44444444444444444444444444444444444444444444444444444444 4ouivbjintwreewpqqqqqqqqqqqqqqqqqppppppppppppppqwssssssssssssssssssssssssssssssss $deviceData ',
+    // );
     return Scaffold(
       backgroundColor: Colors.white.withOpacity(.1),
       body: SizedBox(
@@ -587,14 +614,25 @@ class _deviceManagementState extends State<deviceManagement> {
                                 children: [
                                   DeviceCard(
                                     name: deviceData[firstIndex].Device_name,
-                                    imageUrl: 'assets/images/AirCond.png',
+                                    imageUrl:
+                                        deviceData[firstIndex].images_url != ''
+                                            ? deviceData[firstIndex].images_url
+                                            : 'assets/images/AirCond.png',
+                                    isActive: deviceData[firstIndex].is_active,
                                   ),
                                   if (firstIndex + 1 < deviceData.length)
                                     DeviceCard(
                                       name:
                                           deviceData[firstIndex + 1]
                                               .Device_name,
-                                      imageUrl: 'assets/images/AirCond.png',
+                                      imageUrl:
+                                          deviceData[firstIndex].images_url !=
+                                                  ''
+                                              ? deviceData[firstIndex]
+                                                  .images_url
+                                              : 'assets/images/AirCond.png',
+                                      isActive:
+                                          deviceData[firstIndex + 1].is_active,
                                     ),
                                 ],
                               ),

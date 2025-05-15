@@ -54,7 +54,6 @@ class _DashHomeState extends State<DashHome> {
       SharedPreferences pref = await SharedPreferences.getInstance();
       String? token = pref.getString('token');
       dynamic deviceData = context.read<DeviceProvider>().deviceData;
-
       if (token != null && deviceData.isEmpty) {
         DeviceListResponse response = await fetchDevice(token);
         context.read<DeviceProvider>().setDeviceData(response.devices);
@@ -74,9 +73,7 @@ class _DashHomeState extends State<DashHome> {
 
     dynamic sceneData = context.watch<SceneProvider>().sceneData;
     dynamic deviceData = context.watch<DeviceProvider>().deviceData;
-    // print(
-    //   '44444444444444444444444444444444444444444444444444444444 222222222222222222222222222222222222222222 $deviceData ',
-    // );
+
     return SizedBox(
       height: double.infinity,
       width: double.infinity,
@@ -466,12 +463,21 @@ class _DashHomeState extends State<DashHome> {
                             children: [
                               DeviceCard(
                                 name: deviceData[firstIndex].Device_name,
-                                imageUrl: 'assets/images/AirCond.png',
+                                imageUrl:
+                                    deviceData[firstIndex].images_url != ''
+                                        ? deviceData[firstIndex].images_url
+                                        : 'assets/images/AirCond.png',
+                                isActive: deviceData[firstIndex].is_active,
                               ),
                               if (firstIndex + 1 < deviceData.length)
                                 DeviceCard(
                                   name: deviceData[firstIndex + 1].Device_name,
-                                  imageUrl: 'assets/images/AirCond.png',
+                                  imageUrl:
+                                      deviceData[firstIndex].images_url != ''
+                                          ? deviceData[firstIndex].images_url
+                                          : 'assets/images/AirCond.png',
+                                  isActive:
+                                      deviceData[firstIndex + 1].is_active,
                                 ),
                             ],
                           ),
@@ -483,7 +489,6 @@ class _DashHomeState extends State<DashHome> {
                 ],
               ),
 
-              
               SizedBox(height: 20),
               TitleAdd(firstLabel: 'My Room', AddLabel: 'Add Rooms'),
               SizedBox(height: 15),

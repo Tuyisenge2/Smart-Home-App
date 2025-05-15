@@ -119,6 +119,7 @@ class RoomDetails extends StatelessWidget {
                           child: DeviceCard(
                             name: 'Air Conditioner',
                             imageUrl: 'assets/images/AirCond.png',
+                            isActive: true,
                           ),
                         ),
                         InkWell(
@@ -127,7 +128,9 @@ class RoomDetails extends StatelessWidget {
                           },
                           child: DeviceCard(
                             name: 'Smart TV',
+
                             imageUrl: 'assets/images/AirCond.png',
+                            isActive: true,
                           ),
                         ),
                       ],
@@ -144,10 +147,12 @@ class RoomDetails extends StatelessWidget {
                         DeviceCard(
                           name: 'Smart TV',
                           imageUrl: 'assets/images/AirCond.png',
+                          isActive: true,
                         ),
                         DeviceCard(
                           name: 'Smart TV',
                           imageUrl: 'assets/images/AirCond.png',
+                          isActive: true,
                         ),
                       ],
                     ),
@@ -163,10 +168,12 @@ class RoomDetails extends StatelessWidget {
                         DeviceCard(
                           name: 'Smart TV',
                           imageUrl: 'assets/images/AirCond.png',
+                          isActive: true,
                         ),
                         DeviceCard(
                           name: 'Smart TV',
                           imageUrl: 'assets/images/AirCond.png',
+                          isActive: true,
                         ),
                       ],
                     ),
