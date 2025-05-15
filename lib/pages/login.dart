@@ -127,7 +127,6 @@ class loginScreen extends State<Login> {
                               upDatePrefs('token', response.access_token);
                               // Navigate to dashboard - no need for condition since we know we have a token
                               context.push('/dashboard');
-
                               print(
                                 "Login successful with token: ${response.access_token}",
                               );

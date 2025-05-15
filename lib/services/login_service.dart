@@ -17,10 +17,8 @@ Future<UserLoginResponse> loginUser(String email, String Password) async {
       }),
     );
     if (response.statusCode == 201) {
-    
       return UserLoginResponse.fromJson(jsonDecode(response.body));
     } else if (response.statusCode == 200) {
-
          final jsonData = jsonDecode(response.body);
       return UserLoginResponse.fromJson(
         jsonData['data'] as Map<String, dynamic>,

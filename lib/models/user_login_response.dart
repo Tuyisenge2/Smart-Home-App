@@ -3,9 +3,11 @@
 import 'dart:ffi';
 
 class UserLoginResponse {
+  
   final String access_token;
   final String token_type;
-  final int expires_in;  
+  final int expires_in;
+
   UserLoginResponse({
     required this.access_token,
     required this.token_type,

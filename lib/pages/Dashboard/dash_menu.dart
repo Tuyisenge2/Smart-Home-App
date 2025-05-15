@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:new_app/models/devices_model.dart';
+import 'package:new_app/models/fetch_device_response.dart';
 import 'package:new_app/services/fetchDevice.dart';
 
 class DashMenu extends StatefulWidget {
@@ -12,10 +13,10 @@ class DashMenu extends StatefulWidget {
 }
 
 class _DashMenuState extends State<DashMenu> {
-  late Future<DevicesModel> _futureDevices;
+  late Future<FetchDeviceResponse> _futureDevices;
   void initState() {
     super.initState();
-    _futureDevices = fetchDevices();
+     // _futureDevices = fetchDevices();
     print('futureDevices $_futureDevices');
   }
 
@@ -24,22 +25,22 @@ class _DashMenuState extends State<DashMenu> {
     return Scaffold(
       appBar: AppBar(title: const Text('Dashboard Menu')),
       body: Center(
-        child: FutureBuilder<DevicesModel>(
-          future: _futureDevices,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              print('objecttttttttttttttttttttttttttt ${snapshot.data!.name}');
-              return Column(
-                children: [Text('snauhhhhhhhhhhhhhhh ${snapshot.data!.name}')],
-              );
-            } else if (snapshot.hasError) {
-              print('9jubrurtbueooooooott $snapshot.error');
+        //  child: FutureBuilder<DevicesModel>(
+        //   future: _futureDevices,
+        //   builder: (context, snapshot) {
+        //     if (snapshot.hasData) {
+        //       print('objecttttttttttttttttttttttttttt ${snapshot.data!.name}');
+        //       return Column(
+        //         children: [Text('snauhhhhhhhhhhhhhhh ${snapshot.data!.name}')],
+        //       );
+        //     } else if (snapshot.hasError) {
+        //       print('9jubrurtbueooooooott $snapshot.error');
 
-              return Text('$snapshot.error');
-            }
-            return const CircularProgressIndicator();
-          },
-        ),
+        //       return Text('$snapshot.error');
+        //     }
+        //     return const CircularProgressIndicator();
+        //   },
+        // ),
       ),
     );
   }

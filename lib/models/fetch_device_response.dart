@@ -32,7 +32,7 @@ FetchDeviceResponse {
       id: json['id'],
       Device_name: json['Device_name'],
       Device_room: Map<String, dynamic>.from(json['Device_room']),
-      images_url: json['images_url,'] ?? '',
+      images_url: json['images_url'],
       is_active: (json['is_active'] ?? 0) == 1,
     );
   }

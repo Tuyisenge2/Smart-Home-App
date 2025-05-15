@@ -9,9 +9,7 @@ Future<SceneListResponse> fetchScenes(String token) async {
   try {
     final response = await http.get(
       Uri.parse('http://10.0.2.2:8000/api/scenes'),
-      headers: { 
-        HttpHeaders.authorizationHeader: "Bearer $token" 
-        },
+      headers: {HttpHeaders.authorizationHeader: "Bearer $token"},
     );
 
     // print('Status Code: ${response.statusCode}');
@@ -30,46 +28,48 @@ Future<SceneListResponse> fetchScenes(String token) async {
   }
 }
 
-// Future<DeviceListResponse> fetchDevice(String token) async {
-//   try {
-//     final response = await http.get(
-//       Uri.parse('http://10.0.2.2:8000/api/devices'),
-//       headers: {HttpHeaders.authorizationHeader: "Bearer $token"},
-//     );
-//     // print(
-//     //   'oindoindddddddddddddddddddddddddddddddddddddddddddddddddddtttttttttttttttttttttttttttttt $token',
-//     // );
-//     // print('Status Code: ${response.statusCode}');
-//     // print('Headers: ${response.headers}');
-//     print('Body: ${response.body}');
-
-//     if (response.statusCode == 200) {
-//       // ignore: avoid_print
-//       final jsonData = jsonDecode(response.body);
-//       //    print('Dataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: ${jsonData['scenes']}');
-//       return DeviceListResponse.fromJson(jsonData);
-//     } else {
-//       throw Exception('Failed to load devices');
-//     }
-//   } catch (e) {
-//     print('Error fetching devices: $e');
-//     throw Exception('Failed to load devices: $e');
-//   }
-// }
-
-
-
 Future<DeviceListResponse> fetchDevice(String token) async {
-  final apiService = ApiService(
-  baseUrl: 'http://10.0.2.2:8000/api',
-  token: token,
-);
+  try {
+    final response = await http.get(
+      Uri.parse('http://10.0.2.2:8000/api/devices'),
+      headers: {HttpHeaders.authorizationHeader: "Bearer $token"},
+    );
+    // print(
+    //   'oindoindddddddddddddddddddddddddddddddddddddddddddddddddddtttttttttttttttttttttttttttttt $token',
+    // );
+    // print('Status Code: ${response.statusCode}');
+    // print('Headers: ${response.headers}');
+    print('Body: ${response.body}');
 
-  return apiService.get(
-    endpoint: 'devices',
-    fromJson: DeviceListResponse.fromJson,
-  );
+    if (response.statusCode == 200) {
+      // ignore: avoid_print
+      final jsonData = jsonDecode(response.body);
+      print(
+        'Dataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: ${jsonData}',
+      );
+      return DeviceListResponse.fromJson(jsonData);
+    } else {
+      throw Exception('Failed to load devices');
+    }
+  } catch (e) {
+    print('Error fetching devices: $e');
+    throw Exception('Failed to load devices: $e');
+  }
 }
+
+
+
+// Future<DeviceListResponse> fetchDevice(String token) async {
+//   final apiService = ApiService(
+//   baseUrl: 'http://10.0.2.2:8000/api',
+//   token: token,
+// );
+
+//   return apiService.get(
+//     endpoint: 'devices',
+//     fromJson: DeviceListResponse.fromJson,
+//   );
+// }
 
 
 

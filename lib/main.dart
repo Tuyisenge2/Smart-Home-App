@@ -20,7 +20,6 @@ import 'package:provider/provider.dart';
 
 void main() {
   // runApp(MyApp());
-
   runApp(
     MultiProvider(
       providers: [
@@ -36,7 +35,6 @@ void main() {
 
 class MyApp extends StatelessWidget {
   MyApp({super.key});
-
   final GoRouter _router = GoRouter(
     routes: [
       GoRoute(path: '/', builder: (context, state) => HeroSection()),
