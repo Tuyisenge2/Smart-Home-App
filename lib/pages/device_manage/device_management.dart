@@ -1,11 +1,18 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'dart:ui';
 import 'package:flutter_svg/svg.dart';
 import 'package:new_app/components/customizedButton.dart';
-import 'package:new_app/components/device_card3.dart';
-import 'package:new_app/components/input_field.dart';
-import 'package:new_app/components/scene_card.dart';
+import 'package:new_app/components/device_card.dart';
 import 'package:new_app/components/times_button.dart';
+import 'package:new_app/models/fetch_device_response.dart';
+import 'package:new_app/provider/device_provider.dart';
+import 'package:new_app/services/create_service.dart';
+import 'package:new_app/services/fetch_service.dart';
+import 'package:new_app/util/cloudinary_utils.dart';
+import 'package:new_app/util/snack_bar.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:image_picker/image_picker.dart';
 
 class deviceManagement extends StatefulWidget {
   @override
@@ -13,6 +20,27 @@ class deviceManagement extends StatefulWidget {
 }
 
 class _deviceManagementState extends State<deviceManagement> {
+  CloudinaryUtils cloud = CloudinaryUtils();
+  String name = '';
+  int room_id = 0;
+  bool livRoom = false;
+  File? _imageFile;
+  String images_url = '';
+  bool uploadImage = false;
+  void getDevicesData() async {
+    try {
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      String? token = pref.getString('token');
+      dynamic deviceData = context.read<DeviceProvider>().deviceData;
+      if (token != null) {
+        DeviceListResponse response = await fetchDevice(token);
+        context.read<DeviceProvider>().setDeviceData(response.devices);
+      }
+    } catch (e) {
+      print('Error fetching device data: Error is $e');
+    }
+  }
+
   Container circleDays(String l) {
     return Container(
       height: 35,
@@ -61,63 +89,88 @@ class _deviceManagementState extends State<deviceManagement> {
       backgroundColor: Color(0xFF31373C),
       context: context,
       builder: (BuildContext context) {
-        return Container(
-          padding: EdgeInsets.only(
-            left: MediaQuery.of(context).size.width * 0.03,
-            right: MediaQuery.of(context).size.width * 0.03,
-          ),
-          height: MediaQuery.of(context).size.height * 0.4,
-          width: double.infinity,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Container(
+              padding: EdgeInsets.only(
+                left: MediaQuery.of(context).size.width * 0.03,
+                right: MediaQuery.of(context).size.width * 0.03,
+              ),
+              height: MediaQuery.of(context).size.height * 0.4,
+              width: double.infinity,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  TimesButton(
-                    height: 20,
-                    width: 20,
-                    callback: () {
-                      Navigator.of(context).pop();
-                    },
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TimesButton(
+                        height: 20,
+                        width: 20,
+                        callback: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
                   ),
+                  Center(
+                    child: Text(
+                      "Light",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 25,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+
+                  Container(
+                    width: 80,
+                    height: 80,
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                    //
+                    child: SvgPicture.asset('assets/icons/sun.svg'),
+                  ),
+
+                  !uploadImage
+                      ? Customizedbutton(
+                        label: 'Select from Gallery',
+                        labelColor: Colors.black,
+                        buttonColor: Color(0xFFB9F249),
+                        bottomModal: () async {
+                          _imageFile = await cloud.pickImage(
+                            ImageSource.gallery,
+                          );
+                          setModalState(() {
+                            uploadImage = !uploadImage;
+                          });
+                        },
+                      )
+                      : Customizedbutton(
+                        label: 'Upload Image',
+                        labelColor: Colors.black,
+                        buttonColor: Color(0xFFB9F249),
+                        bottomModal: () async {
+                          images_url =
+                              await cloud.uploadImage(_imageFile!) ?? '';
+                          setModalState(() {
+                            uploadImage = !uploadImage;
+                          });
+                          Navigator.of(context).pop();
+                          Future.delayed(Duration(milliseconds: 300), () {
+                            creatSceneSecondModal();
+                          });
+                        },
+                      ),
                 ],
               ),
-              Center(
-                child: Text(
-                  "Light",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 25,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-
-              Container(
-                width: 80,
-                height: 80,
-                padding: EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(100),
-                ),
-                //
-                child: SvgPicture.asset('assets/icons/sun.svg'),
-              ),
-
-              Customizedbutton(
-                label: 'Continue',
-                labelColor: Colors.black,
-                buttonColor: Color(0xFFB9F249),
-                bottomModal: () {
-                  Navigator.of(context).pop();
-                  creatSceneSecondModal();
-                },
-              ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
@@ -129,124 +182,136 @@ class _deviceManagementState extends State<deviceManagement> {
       backgroundColor: Color(0xFF31373C),
       context: context,
       builder: (BuildContext context) {
-        return Container(
-          padding: EdgeInsets.only(
-            top: MediaQuery.of(context).size.height * 0.01,
-            left: MediaQuery.of(context).size.width * 0.03,
-            right: MediaQuery.of(context).size.width * 0.03,
-          ),
-          height: MediaQuery.of(context).size.height * 0.8,
-          width: double.infinity,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Container(
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).size.height * 0.01,
+                left: MediaQuery.of(context).size.width * 0.03,
+                right: MediaQuery.of(context).size.width * 0.03,
+              ),
+              height: MediaQuery.of(context).size.height * 0.8,
+              width: double.infinity,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  TimesButton(
-                    height: 20,
-                    width: 20,
-                    callback: () {
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TimesButton(
+                        height: 20,
+                        width: 20,
+                        callback: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  ),
+                  Center(
+                    child: Text(
+                      "Select Room",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () {
+                      setModalState(() {
+                        livRoom = !livRoom;
+                        room_id = 1;
+                      });
+                    },
+                    child: Container(
+                      height: 50,
+                      width: 190,
+                      decoration: BoxDecoration(
+                        color: livRoom ? Color(0xFFB9F249) : Color(0xFF181D23),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Living Room',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 17,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  Container(
+                    height: 50,
+                    width: 190,
+                    decoration: BoxDecoration(
+                      color: Color(0xFF181D23),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Living Room',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: 50,
+                    width: 190,
+                    decoration: BoxDecoration(
+                      color: Color(0xFF181D23),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Bed Room',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: 50,
+                    width: 190,
+                    decoration: BoxDecoration(
+                      color: Color(0xFF181D23),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Kitchen',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  Customizedbutton(
+                    label: 'Continue',
+                    labelColor: Colors.black,
+                    buttonColor: Color(0xFFB9F249),
+                    bottomModal: () {
                       Navigator.of(context).pop();
+                      createSceneThirdModal();
                     },
                   ),
                 ],
               ),
-              Center(
-                child: Text(
-                  "Select Room",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              Container(
-                height: 50,
-                width: 190,
-                decoration: BoxDecoration(
-                  color: Color(0xFF181D23),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Center(
-                  child: Text(
-                    'Living Room',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-              ),
-
-              Container(
-                height: 50,
-                width: 190,
-                decoration: BoxDecoration(
-                  color: Color(0xFF181D23),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Center(
-                  child: Text(
-                    'Living Room',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                height: 50,
-                width: 190,
-                decoration: BoxDecoration(
-                  color: Color(0xFF181D23),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Center(
-                  child: Text(
-                    'Bed Room',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                height: 50,
-                width: 190,
-                decoration: BoxDecoration(
-                  color: Color(0xFF181D23),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Center(
-                  child: Text(
-                    'Kitchen',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 17,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ),
-              ),
-
-              Customizedbutton(
-                label: 'Continue',
-                labelColor: Colors.black,
-                buttonColor: Color(0xFFB9F249),
-                bottomModal: () {
-                  Navigator.of(context).pop();
-                  createSceneThirdModal();
-                },
-              ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
@@ -318,6 +383,11 @@ class _deviceManagementState extends State<deviceManagement> {
                             Flexible(
                               flex: 8,
                               child: TextField(
+                                onChanged: (value) {
+                                  setState(() {
+                                    name = value;
+                                  });
+                                },
                                 decoration: InputDecoration(
                                   fillColor: Colors.white,
                                   filled: true,
@@ -359,9 +429,36 @@ class _deviceManagementState extends State<deviceManagement> {
                     label: 'Continue',
                     labelColor: Colors.black,
                     buttonColor: Color(0xFFB9F249),
-                    bottomModal: () {
-                      Navigator.of(context).pop();
-                      createSceneFoufthModal();
+                    bottomModal: () async {
+                      try {
+                        SharedPreferences pref =
+                            await SharedPreferences.getInstance();
+                        final token = pref.getString('token');
+                        final response = await createDevice(
+                          name,
+                          room_id,
+                          images_url,
+                          token!,
+                        );
+                        if (response['status'] == true) {
+                          showTopSnackBar(
+                            context,
+                            'Device created successful!',
+                            Colors.green,
+                          );
+                          Navigator.of(context).pop();
+                          // Force refresh devices
+                          getDevicesData();
+                          createSceneFoufthModal(name);
+                        }
+                      } catch (e) {
+                        print('Error creating device: $e');
+                        showTopSnackBar(
+                          context,
+                          'Device creation Failed!',
+                          Colors.red,
+                        );
+                      }
                     },
                   ),
                 ],
@@ -373,7 +470,7 @@ class _deviceManagementState extends State<deviceManagement> {
     );
   }
 
-  void createSceneFoufthModal() {
+  void createSceneFoufthModal(String name) {
     showModalBottomSheet(
       barrierColor: Colors.transparent,
       backgroundColor: Color(0xFF31373C),
@@ -406,7 +503,7 @@ class _deviceManagementState extends State<deviceManagement> {
               Column(
                 children: [
                   Text(
-                    "Light Added to",
+                    "$name added to ",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 22,
@@ -450,6 +547,10 @@ class _deviceManagementState extends State<deviceManagement> {
 
   @override
   Widget build(BuildContext context) {
+    dynamic deviceData = context.watch<DeviceProvider>().deviceData;
+    // print(
+    //   '44444444444444444444444444444444444444444444444444444444 4ouivbjintwreewpqqqqqqqqqqqqqqqqqppppppppppppppqwssssssssssssssssssssssssssssssss $deviceData ',
+    // );
     return Scaffold(
       backgroundColor: Colors.white.withOpacity(.1),
       body: SizedBox(
@@ -497,16 +598,52 @@ class _deviceManagementState extends State<deviceManagement> {
                     ),
                   ),
                   SizedBox(height: 20),
-                  Container(
-                    padding: EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [DeviceCard3(), DeviceCard3()],
-                    ),
+                  Column(
+                    children: [
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.45,
+                        child: ListView.builder(
+                          itemCount: (deviceData.length / 2).ceil(),
+                          itemBuilder: (context, rowIndex) {
+                            final firstIndex = rowIndex * 2;
+                            return Padding(
+                              padding: EdgeInsets.only(bottom: 3),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  DeviceCard(
+                                    name: deviceData[firstIndex].Device_name,
+                                    imageUrl:
+                                        deviceData[firstIndex].images_url != ''
+                                            ? deviceData[firstIndex].images_url
+                                            : 'assets/images/AirCond.png',
+                                    isActive: deviceData[firstIndex].is_active,
+                                  ),
+                                  if (firstIndex + 1 < deviceData.length)
+                                    DeviceCard(
+                                      name:
+                                          deviceData[firstIndex + 1]
+                                              .Device_name,
+                                      imageUrl:
+                                          deviceData[firstIndex].images_url !=
+                                                  ''
+                                              ? deviceData[firstIndex]
+                                                  .images_url
+                                              : 'assets/images/AirCond.png',
+                                      isActive:
+                                          deviceData[firstIndex + 1].is_active,
+                                    ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                    ],
                   ),
+
                   Spacer(),
                   Customizedbutton(
                     label: 'Add Device',

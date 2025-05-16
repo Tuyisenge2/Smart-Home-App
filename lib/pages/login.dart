@@ -3,12 +3,34 @@ import 'package:flutter_svg/svg.dart' show SvgPicture;
 import 'package:go_router/go_router.dart';
 import 'package:new_app/components/back_button.dart';
 import 'package:new_app/components/forget_button.dart';
-import 'package:new_app/components/input_field.dart';
+//import 'package:new_app/components/input_field.dart';
 import 'package:new_app/components/responsive_text.dart';
+import 'package:new_app/models/user_login_response.dart';
+import 'package:new_app/provider/is_user_auth_provider.dart';
+//import 'package:new_app/provider/user_provider.dart';
+import 'package:new_app/services/login_service.dart';
+import 'package:new_app/services/prefs.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class Login extends StatelessWidget {
+class Login extends StatefulWidget {
+  const Login({Key? key}) : super(key: key);
+
+  @override
+  State<Login> createState() => loginScreen();
+}
+
+class loginScreen extends State<Login> {
+  // final TextEditingController _emailController = TextEditingController();
+  // final TextEditingController _passwordController = TextEditingController();
+  String email = '';
+  String password = '';
+  Future<UserLoginResponse>? futureLogin;
   @override
   Widget build(BuildContext context) {
+    //  var userName=context.watch<UserProvider>().userName;
+    //  String userName =Provider.of<UserProvider>(context, listen: false).userName;
+    // String token = Provider.of<IsUserAuthProvider>(context).token;
     return Container(
       width: double.infinity,
       height: double.infinity,
@@ -84,25 +106,49 @@ class Login extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 20),
-                    InputField(
-                      width: 400,
-                      hint: 'Email',
-                      inputColor: Colors.white,
-                    ),
+                    InputField(400, 'Email', Colors.white, 'email'),
                     SizedBox(height: 10),
-                    InputField(
-                      width: 400,
-                      hint: 'Password',
-                      inputColor: Colors.white,
-                    ),
+                    InputField(400, 'Password', Colors.white, 'password'),
 
                     SizedBox(height: 20),
                     SizedBox(
                       height: 47,
                       width: 400,
                       child: TextButton(
-                        onPressed: () {
-                          context.push('/dashboard');
+                        onPressed: () async {
+                          try {
+                            final response = await loginUser(email, password);
+                            if (response.access_token != null &&
+                                response.access_token.isNotEmpty) {
+                              // Update provider with new token
+                              context.read<IsUserAuthProvider>().setToken(
+                                response.access_token,
+                              );
+                              upDatePrefs('token', response.access_token);
+                              // Navigate to dashboard - no need for condition since we know we have a token
+                              context.push('/dashboard');
+
+                              print(
+                                "Login successful with token: ${response.access_token}",
+                              );
+                            } else {
+                              // Handle failed login
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Login failed - no token received',
+                                  ),
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            // Handle errors
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Login error: ${e.toString()}'),
+                              ),
+                            );
+                          }
                         },
                         style: TextButton.styleFrom(
                           backgroundColor: Colors.green,
@@ -211,6 +257,37 @@ class Login extends StatelessWidget {
                 ),
               ),
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  ConstrainedBox InputField(
+    double width,
+    String hint,
+    Color inputColor,
+    String input,
+  ) {
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: width),
+      child: TextField(
+        onChanged: (value) {
+          setState(() {
+            if (input == 'email') {
+              email = value;
+            } else if (input == 'password') {
+              password = value;
+            }
+          });
+        },
+        decoration: InputDecoration(
+          hintText: hint,
+          fillColor: inputColor,
+          filled: true,
+          border: OutlineInputBorder(
+            borderSide: BorderSide(color: inputColor),
+            borderRadius: BorderRadius.all(Radius.circular(8)),
           ),
         ),
       ),

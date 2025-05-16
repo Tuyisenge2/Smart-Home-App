@@ -2,8 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 class DeviceCard extends StatefulWidget {
-  const DeviceCard({super.key});
-
+  final String name;
+  final String imageUrl;
+  final bool isActive;
+  const DeviceCard({
+    super.key,
+    required this.name,
+    required this.imageUrl,
+    required this.isActive,
+  });
   @override
   State<DeviceCard> createState() => _DeviceCardState();
 }
@@ -29,9 +36,10 @@ class _DeviceCardState extends State<DeviceCard> {
             padding: EdgeInsets.only(left: 140.0),
             child: InkWell(child: SvgPicture.asset('assets/icons/less2.svg')),
           ),
-          Image.asset('assets/images/AirCond.png'),
+          //    Image.asset( widget.imageUrl?? 'assets/images/AirCond.png'),
+          Image.network(widget.imageUrl, height: 50, width: 120),
           Text(
-            "Air Conditioner",
+            widget.name,
             style: TextStyle(
               fontSize: 15,
               color: Colors.white,
@@ -47,13 +55,9 @@ class _DeviceCardState extends State<DeviceCard> {
           Padding(
             padding: const EdgeInsets.only(left: 110.0),
             child: InkWell(
-              onTap: () {
-                setState(() {
-                  isToggleOn = !isToggleOn;
-                });
-              },
+              onTap: () {},
               child:
-                  isToggleOn
+                  widget.isActive
                       ? SvgPicture.asset('assets/icons/toggleButtonOn.svg')
                       : SvgPicture.asset('assets/icons/toggleButton.svg'),
             ),
@@ -63,7 +67,3 @@ class _DeviceCardState extends State<DeviceCard> {
     );
   }
 }
-
-// class DeviceCard extends StatelessWidget {
-
-// }

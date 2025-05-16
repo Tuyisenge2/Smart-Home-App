@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
@@ -7,10 +9,71 @@ import 'package:new_app/components/plus_button.dart';
 import 'package:new_app/components/rooms_component.dart';
 import 'package:new_app/components/scene_card.dart';
 import 'package:new_app/components/title_add.dart';
+import 'package:new_app/models/fetch_device_response.dart';
+import 'package:new_app/models/fetch_scene_response.dart';
+import 'package:new_app/provider/device_provider.dart';
+import 'package:new_app/provider/is_user_auth_provider.dart';
+import 'package:new_app/provider/scene_provider.dart';
+import 'package:new_app/provider/user_provider.dart';
+import 'package:new_app/services/fetch_service.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class DashHome extends StatelessWidget {
+class DashHome extends StatefulWidget {
+  const DashHome({super.key});
+  @override
+  _DashHomeState createState() => _DashHomeState();
+}
+
+class _DashHomeState extends State<DashHome> {
+  @override
+  void initState() {
+    super.initState();
+    getSceneData();
+    getDevicesData();
+  }
+
+  void getSceneData() async {
+    try {
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      String? token = pref.getString('token');
+      dynamic sceneData = context.read<SceneProvider>().sceneData;
+      if (token != null && sceneData.isEmpty) {
+        SceneListResponse response = await fetchScenes(token);
+        context.read<SceneProvider>().setSceneData(response.scenes);
+      }
+    } catch (e) {
+      print('Error fetching scene data: mana $e');
+      context.push('/Login');
+    }
+  }
+
+  //
+  void getDevicesData() async {
+    try {
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      String? token = pref.getString('token');
+      dynamic deviceData = context.read<DeviceProvider>().deviceData;
+      if (token != null && deviceData.isEmpty) {
+        DeviceListResponse response = await fetchDevice(token);
+        context.read<DeviceProvider>().setDeviceData(response.devices);
+      }
+    } catch (e) {
+      print('Error fetching device data: Error is $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    String userName =
+        Provider.of<UserProvider>(context, listen: false).userName;
+    String myToken = Provider.of<IsUserAuthProvider>(context).token;
+    print("Token is $myToken");
+    print("User name is $userName");
+
+    dynamic sceneData = context.watch<SceneProvider>().sceneData;
+    dynamic deviceData = context.watch<DeviceProvider>().deviceData;
+
     return SizedBox(
       height: double.infinity,
       width: double.infinity,
@@ -330,28 +393,47 @@ class DashHome extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 10),
-
               Container(
-                padding: EdgeInsets.all(4),
+                height: MediaQuery.of(context).size.height * 0.3,
+                padding: EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: Column(
-                  spacing: 4,
-                  children: [
-                    SceneCard(
-                      sceneMess: 'Morning scene',
-                      iconPath: 'assets/icons/sun.svg',
-                      togglePath: 'assets/icons/toggleButton.svg',
-                    ),
-                    SceneCard(
-                      sceneMess: 'Night scene',
-                      iconPath: 'assets/icons/moon.svg',
-                      togglePath: 'assets/icons/toggleButton.svg',
-                    ),
-                  ],
-                ),
+                child:
+                    sceneData.isEmpty
+                        ? SizedBox(
+                          width: double.infinity,
+                          child: Center(
+                            child: Text(
+                              'No Scene Found',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                              ),
+                            ),
+                          ),
+                        )
+                        : ListView.builder(
+                          itemCount: 3,
+                          itemBuilder: (context, index) {
+                            final currentScene = sceneData[index];
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 4.0),
+                              child: SceneCard(
+                                sceneMess: currentScene.name,
+                                iconPath:
+                                    currentScene.name.toLowerCase().contains(
+                                          'morning',
+                                        )
+                                        ? 'assets/icons/sun.svg'
+                                        : 'assets/icons/moon.svg',
+                                togglePath: 'assets/icons/toggleButton.svg',
+                                isActive: currentScene.is_active,
+                              ),
+                            );
+                          },
+                        ),
               ),
 
               SizedBox(height: 10),
@@ -365,20 +447,48 @@ class DashHome extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 10),
+
               Column(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [DeviceCard(), DeviceCard()],
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.45,
+                    child: ListView.builder(
+                      itemCount: (deviceData.length / 2).ceil(),
+                      itemBuilder: (context, rowIndex) {
+                        final firstIndex = rowIndex * 2;
+                        return Padding(
+                          padding: EdgeInsets.only(bottom: 3),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              DeviceCard(
+                                name: deviceData[firstIndex].Device_name,
+                                imageUrl:
+                                    deviceData[firstIndex].images_url != ''
+                                        ? deviceData[firstIndex].images_url
+                                        : 'assets/images/AirCond.png',
+                                isActive: deviceData[firstIndex].is_active,
+                              ),
+                              if (firstIndex + 1 < deviceData.length)
+                                DeviceCard(
+                                  name: deviceData[firstIndex + 1].Device_name,
+                                  imageUrl:
+                                      deviceData[firstIndex].images_url != ''
+                                          ? deviceData[firstIndex].images_url
+                                          : 'assets/images/AirCond.png',
+                                  isActive:
+                                      deviceData[firstIndex + 1].is_active,
+                                ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
                   ),
                   SizedBox(height: 16),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [DeviceCard2(), DeviceCard2()],
-                  ),
                 ],
               ),
+
               SizedBox(height: 20),
               TitleAdd(firstLabel: 'My Room', AddLabel: 'Add Rooms'),
               SizedBox(height: 15),
