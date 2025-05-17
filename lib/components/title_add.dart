@@ -4,7 +4,12 @@ import 'package:new_app/components/plus_button.dart';
 class TitleAdd extends StatelessWidget {
   final String firstLabel;
   final String AddLabel;
-  const TitleAdd({required this.firstLabel, required this.AddLabel});
+  final VoidCallback? onTap;
+  const TitleAdd({
+    required this.firstLabel, 
+    required this.AddLabel,
+    this.onTap,
+    });
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -18,7 +23,10 @@ class TitleAdd extends StatelessWidget {
             fontWeight: FontWeight.w800,
           ),
         ),
-        Container(
+        GestureDetector(
+          onTap: onTap,
+        
+        child: Container(
           height: 20,
           width: 100,
           decoration: BoxDecoration(
@@ -35,6 +43,7 @@ class TitleAdd extends StatelessWidget {
               ),
             ],
           ),
+        ),
         ),
       ],
     );

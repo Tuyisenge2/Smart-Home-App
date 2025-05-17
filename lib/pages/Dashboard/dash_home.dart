@@ -380,7 +380,10 @@ class DashHome extends StatelessWidget {
                 ],
               ),
               SizedBox(height: 20),
-              TitleAdd(firstLabel: 'My Room', AddLabel: 'Add Rooms'),
+                TitleAdd(
+                  firstLabel: 'My Room', 
+                  AddLabel: 'Add Rooms',
+                ),
               SizedBox(height: 15),
               Column(
                 spacing: 15,
