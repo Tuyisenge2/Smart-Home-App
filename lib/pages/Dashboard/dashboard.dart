@@ -15,7 +15,6 @@ class _DashboardState extends State<DashboardWithBottom> {
   void init() {}
   int pageIndex = 0;
   final pages = [DashHome(), RoomsPage(), DashMenu()];
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(

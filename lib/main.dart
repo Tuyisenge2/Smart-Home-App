@@ -5,6 +5,8 @@ import 'package:new_app/pages/Dashboard/Dashboard.dart';
 import 'package:new_app/pages/device_manage/device_management.dart';
 import 'package:new_app/pages/Dashboard/rooms_list.dart';
 // import 'package:new_app/pages/LoginPage.dart';
+import 'package:new_app/pages/Dashboard/rooms_list.dart';
+// import 'package:new_app/pages/LoginPage.dart';
 import 'package:new_app/pages/ResetPassword.dart' show Resetpassword;
 import 'package:new_app/pages/forgetPassword.dart' show Forgetpassword;
 import 'package:new_app/pages/hero_section.dart';
