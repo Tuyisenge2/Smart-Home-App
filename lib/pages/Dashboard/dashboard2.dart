@@ -394,10 +394,10 @@ class Dashboard extends StatelessWidget {
                 Column(
                   spacing: 15,
                   children: [
-                    RoomsComponent(roomName: 'Living Room', deviceCount: 5),
-                    RoomsComponent(roomName: 'Bed Room', deviceCount: 2),
-                    RoomsComponent(roomName: 'Bed Room 2', deviceCount: 1),
-                    RoomsComponent(roomName: 'Kitchen', deviceCount: 1),
+                    RoomsComponent(roomName: 'Living Room', deviceCount: 5, isRoomorHome: "room"),
+                    RoomsComponent(roomName: 'Bed Room', deviceCount: 2, isRoomorHome: "room"),
+                    RoomsComponent(roomName: 'Bed Room 2', deviceCount: 1, isRoomorHome: "room"),
+                    RoomsComponent(roomName: 'Kitchen', deviceCount: 1, isRoomorHome: "room"),
                   ],
                 ),
               ],
