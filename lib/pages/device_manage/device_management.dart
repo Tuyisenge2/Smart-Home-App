@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names, camel_case_types, library_private_types_in_public_api
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -7,6 +9,7 @@ import 'package:new_app/components/times_button.dart';
 import 'package:new_app/models/fetch_device_response.dart';
 import 'package:new_app/provider/device_provider.dart';
 import 'package:new_app/services/create_service.dart';
+import 'package:new_app/services/fetchDevice.dart';
 import 'package:new_app/services/fetch_service.dart';
 import 'package:new_app/util/cloudinary_utils.dart';
 import 'package:new_app/util/snack_bar.dart';
@@ -15,6 +18,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
 
 class deviceManagement extends StatefulWidget {
+  const deviceManagement({super.key});
+
   @override
   _deviceManagementState createState() => _deviceManagementState();
 }
@@ -27,6 +32,8 @@ class _deviceManagementState extends State<deviceManagement> {
   File? _imageFile;
   String images_url = '';
   bool uploadImage = false;
+  bool isUploadingImage = false;
+  bool isCreatingDevice = false;
   void getDevicesData() async {
     try {
       SharedPreferences pref = await SharedPreferences.getInstance();
@@ -151,20 +158,30 @@ class _deviceManagementState extends State<deviceManagement> {
                           });
                         },
                       )
+                      : isUploadingImage
+                      ? uploadingButton(
+                        Color(0xFFB9F249),
+                        Colors.black,
+                        ' uploading ',
+                      )
                       : Customizedbutton(
                         label: 'Upload Image',
                         labelColor: Colors.black,
                         buttonColor: Color(0xFFB9F249),
                         bottomModal: () async {
+                          setModalState(() {
+                            isUploadingImage = true;
+                          });
                           images_url =
                               await cloud.uploadImage(_imageFile!) ?? '';
                           setModalState(() {
                             uploadImage = !uploadImage;
+                            isUploadingImage = false;
                           });
                           Navigator.of(context).pop();
-                          Future.delayed(Duration(milliseconds: 300), () {
-                            creatSceneSecondModal();
-                          });
+                          //Future.delayed(Duration(milliseconds: 300), () {
+                          creatSceneSecondModal();
+                          //});
                         },
                       ),
                 ],
@@ -425,42 +442,54 @@ class _deviceManagementState extends State<deviceManagement> {
                       ),
                     ],
                   ),
-                  Customizedbutton(
-                    label: 'Continue',
-                    labelColor: Colors.black,
-                    buttonColor: Color(0xFFB9F249),
-                    bottomModal: () async {
-                      try {
-                        SharedPreferences pref =
-                            await SharedPreferences.getInstance();
-                        final token = pref.getString('token');
-                        final response = await createDevice(
-                          name,
-                          room_id,
-                          images_url,
-                          token!,
-                        );
-                        if (response['status'] == true) {
-                          showTopSnackBar(
-                            context,
-                            'Device created successful!',
-                            Colors.green,
-                          );
-                          Navigator.of(context).pop();
-                          // Force refresh devices
-                          getDevicesData();
-                          createSceneFoufthModal(name);
-                        }
-                      } catch (e) {
-                        print('Error creating device: $e');
-                        showTopSnackBar(
-                          context,
-                          'Device creation Failed!',
-                          Colors.red,
-                        );
-                      }
-                    },
-                  ),
+                  !isCreatingDevice
+                      ? uploadingButton(
+                        Color(0xFFB9F249),
+                        Colors.black,
+                        'Continue',
+                      )
+                      : Customizedbutton(
+                        label: 'Continue',
+                        labelColor: Colors.black,
+                        buttonColor: Color(0xFFB9F249),
+                        bottomModal: () async {
+                          try {
+                            setState(() {
+                              isCreatingDevice = true;
+                            });
+                            SharedPreferences pref =
+                                await SharedPreferences.getInstance();
+                            final token = pref.getString('token');
+                            final response = await createDevice(
+                              name,
+                              room_id,
+                              images_url,
+                              token!,
+                            );
+                            if (response['status'] == true) {
+                              setState(() {
+                                isCreatingDevice = false;
+                              });
+                              showTopSnackBar(
+                                context,
+                                'Device created successful!',
+                                Colors.green,
+                              );
+                              Navigator.of(context).pop();
+                              getDevicesData();
+
+                              createSceneFoufthModal(name);
+                            }
+                          } catch (e) {
+                            print('Error creating device: $e');
+                            showTopSnackBar(
+                              context,
+                              'Device creation Failed!',
+                              Colors.red,
+                            );
+                          }
+                        },
+                      ),
                 ],
               ),
             ),
@@ -548,9 +577,9 @@ class _deviceManagementState extends State<deviceManagement> {
   @override
   Widget build(BuildContext context) {
     dynamic deviceData = context.watch<DeviceProvider>().deviceData;
-    // print(
-    //   '44444444444444444444444444444444444444444444444444444444 4ouivbjintwreewpqqqqqqqqqqqqqqqqqppppppppppppppqwssssssssssssssssssssssssssssssss $deviceData ',
-    // );
+    print(
+      '44444444444444444444444444444444444444444444444444444444 4ouivbjintwreewpqqqqqqqqqqqqqqqqqppppppppppppppqwssssssssssssssssssssssssssssssss $deviceData ',
+    );
     return Scaffold(
       backgroundColor: Colors.white.withOpacity(.1),
       body: SizedBox(
@@ -619,6 +648,7 @@ class _deviceManagementState extends State<deviceManagement> {
                                             ? deviceData[firstIndex].images_url
                                             : 'assets/images/AirCond.png',
                                     isActive: deviceData[firstIndex].is_active,
+                                    id: deviceData[firstIndex].id,
                                   ),
                                   if (firstIndex + 1 < deviceData.length)
                                     DeviceCard(
@@ -626,13 +656,15 @@ class _deviceManagementState extends State<deviceManagement> {
                                           deviceData[firstIndex + 1]
                                               .Device_name,
                                       imageUrl:
-                                          deviceData[firstIndex].images_url !=
+                                          deviceData[firstIndex + 1]
+                                                      .images_url !=
                                                   ''
-                                              ? deviceData[firstIndex]
+                                              ? deviceData[firstIndex + 1]
                                                   .images_url
                                               : 'assets/images/AirCond.png',
                                       isActive:
                                           deviceData[firstIndex + 1].is_active,
+                                      id: deviceData[firstIndex + 1].id,
                                     ),
                                 ],
                               ),
@@ -655,6 +687,41 @@ class _deviceManagementState extends State<deviceManagement> {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget uploadingButton(Color buttonColor, Color labelColor, String label) {
+    return InkWell(
+      onTap: () {
+        bottomModal();
+      },
+      child: Container(
+        height: 50,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: buttonColor,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                color: labelColor,
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            SizedBox(width: 10),
+            SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(color: Colors.black),
+            ),
+          ],
         ),
       ),
     );

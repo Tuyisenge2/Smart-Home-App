@@ -23,7 +23,7 @@ Future<SceneListResponse> fetchScenes(String token) async {
       throw Exception('Failed to load scenes ');
     }
   } catch (e) {
-    print('Error fetching scenes : $e');
+    // print('Error fetching scenes : $e');
     throw Exception('Failed to load scenes : $e');
   }
 }
@@ -39,14 +39,14 @@ Future<DeviceListResponse> fetchDevice(String token) async {
     // );
     // print('Status Code: ${response.statusCode}');
     // print('Headers: ${response.headers}');
-    print('Body: ${response.body}');
+    // print('Body: ${response.body}');
 
     if (response.statusCode == 200) {
       // ignore: avoid_print
       final jsonData = jsonDecode(response.body);
-      print(
-        'Dataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: ${jsonData}',
-      );
+      // print(
+      //   'Dataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: ${jsonData}',
+      // );
       return DeviceListResponse.fromJson(jsonData);
     } else {
       throw Exception('Failed to load devices');
@@ -56,6 +56,50 @@ Future<DeviceListResponse> fetchDevice(String token) async {
     throw Exception('Failed to load devices: $e');
   }
 }
+
+Future<dynamic> updateDevice(String token, bool isActive, int id) async {
+  try {
+    final response = await http.put(
+      Uri.parse('http://10.0.2.2:8000/api/devices/$id'),
+      headers: {
+        'content-Type': 'application/json;charset=UTF-8',
+        HttpHeaders.authorizationHeader: "Bearer $token",
+      },
+      body: jsonEncode(<String, dynamic>{'is_active': isActive}),
+    );
+    // print(
+    //   'oindoindddddddddddddddddddddddddddddddddddddddddddddddddddtttttttttttttttttttttttttttttt $token',
+    // );
+    // print('Status Code: ${response.statusCode}');
+    // print('Headers: ${response.headers}');
+    print('Body: ${response.body}');
+
+    if (response.statusCode == 200) {
+      // ignore: avoid_print
+      final jsonData = jsonDecode(response.body);
+      print(
+        'Dataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa: ${jsonData}',
+      );
+      return "Device updated successfully";
+    } else {
+      throw Exception('Failed to update devices');
+    }
+  } catch (e) {
+    throw Exception('Failed to update devices: $e');
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -1,3 +1,10 @@
+import 'package:flutter/material.dart';
+import 'package:new_app/models/fetch_device_response.dart';
+import 'package:new_app/provider/device_provider.dart';
+import 'package:new_app/services/fetch_service.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 // import 'dart:convert';
 // import 'dart:io';
 // import 'package:http/http.dart' as http;
@@ -30,3 +37,20 @@
 //     throw Exception('Failed to load devices: $e');
 //   }
 // }
+
+class deviceUtils {
+  static Future<void> getDevicesData(BuildContext context) async {
+    try {
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      String? token = pref.getString('token');
+      dynamic deviceData = context.read<DeviceProvider>().deviceData;
+      if (token != null) {
+        DeviceListResponse response = await fetchDevice(token);
+        context.read<DeviceProvider>().setDeviceData(response.devices);
+      }
+    } catch (e) {
+      print('Error fetching device data: Error is $e');
+    }
+  }
+}
+

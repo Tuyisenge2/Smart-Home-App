@@ -26,7 +26,6 @@ class DashHome extends StatefulWidget {
 }
 
 class _DashHomeState extends State<DashHome> {
-  
   @override
   void initState() {
     super.initState();
@@ -468,10 +467,13 @@ class _DashHomeState extends State<DashHome> {
                                     deviceData[firstIndex].images_url != ''
                                         ? deviceData[firstIndex].images_url
                                         : 'assets/images/AirCond.png',
+                                id: 1,
                                 isActive: deviceData[firstIndex].is_active,
                               ),
                               if (firstIndex + 1 < deviceData.length)
                                 DeviceCard(
+                                  id: 1,
+
                                   name: deviceData[firstIndex + 1].Device_name,
                                   imageUrl:
                                       deviceData[firstIndex].images_url != ''

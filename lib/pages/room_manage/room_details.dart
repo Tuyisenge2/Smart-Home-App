@@ -119,6 +119,8 @@ class RoomDetails extends StatelessWidget {
                           child: DeviceCard(
                             name: 'Air Conditioner',
                             imageUrl: 'assets/images/AirCond.png',
+                            id: 1,
+
                             isActive: true,
                           ),
                         ),
@@ -128,6 +130,7 @@ class RoomDetails extends StatelessWidget {
                           },
                           child: DeviceCard(
                             name: 'Smart TV',
+                            id: 1,
 
                             imageUrl: 'assets/images/AirCond.png',
                             isActive: true,
@@ -146,6 +149,7 @@ class RoomDetails extends StatelessWidget {
                       children: [
                         DeviceCard(
                           name: 'Smart TV',
+                          id: 1,
                           imageUrl: 'assets/images/AirCond.png',
                           isActive: true,
                         ),
@@ -153,6 +157,7 @@ class RoomDetails extends StatelessWidget {
                           name: 'Smart TV',
                           imageUrl: 'assets/images/AirCond.png',
                           isActive: true,
+                          id: 1,
                         ),
                       ],
                     ),
@@ -166,12 +171,14 @@ class RoomDetails extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         DeviceCard(
+                          id: 1,
                           name: 'Smart TV',
                           imageUrl: 'assets/images/AirCond.png',
                           isActive: true,
                         ),
                         DeviceCard(
                           name: 'Smart TV',
+                          id: 1,
                           imageUrl: 'assets/images/AirCond.png',
                           isActive: true,
                         ),

@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:new_app/models/fetch_device_response.dart';
+import 'package:new_app/provider/device_provider.dart';
+import 'package:new_app/services/fetchDevice.dart' show deviceUtils;
+import 'package:new_app/services/fetch_service.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class DeviceCard extends StatefulWidget {
   final String name;
   final String imageUrl;
   final bool isActive;
+  final int id;
   const DeviceCard({
     super.key,
     required this.name,
     required this.imageUrl,
     required this.isActive,
+    required this.id,
   });
   @override
   State<DeviceCard> createState() => _DeviceCardState();
@@ -51,11 +59,29 @@ class _DeviceCardState extends State<DeviceCard> {
             "3 devices",
             style: TextStyle(fontSize: 13, color: Colors.white, height: 1),
           ),
-
           Padding(
             padding: const EdgeInsets.only(left: 110.0),
             child: InkWell(
-              onTap: () {},
+              onTap: () async {
+                try {
+                  SharedPreferences pref =
+                      await SharedPreferences.getInstance();
+                  String? token = pref.getString('token');
+                  print(
+                    'dataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaatrryyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy ,$token ${widget.isActive} ${widget.id}   ',
+                  );
+                  dynamic res = await updateDevice(
+                    token!,
+                    !widget.isActive,
+                    widget.id,
+                  );
+                  //  getDevicesData();
+                  await deviceUtils.getDevicesData(context);
+                } catch (e) {
+                  print('Error updating device: $e');
+                  throw Exception('Error updating device');
+                }
+              },
               child:
                   widget.isActive
                       ? SvgPicture.asset('assets/icons/toggleButtonOn.svg')
