@@ -31,6 +31,7 @@ class loginScreen extends State<Login> {
     //  var userName=context.watch<UserProvider>().userName;
     //  String userName =Provider.of<UserProvider>(context, listen: false).userName;
     // String token = Provider.of<IsUserAuthProvider>(context).token;
+    bool isLoading = Provider.of<IsUserAuthProvider>(context).isLoading;
     return Container(
       width: double.infinity,
       height: double.infinity,
@@ -106,59 +107,89 @@ class loginScreen extends State<Login> {
                       ),
                     ),
                     SizedBox(height: 20),
-                    InputField(400, 'Email', Colors.white, 'email'),
+                    InputField(400, 'Email', Colors.white, 'email', false),
                     SizedBox(height: 10),
-                    InputField(400, 'Password', Colors.white, 'password'),
+                    InputField(400, 'Password', Colors.white, 'password', true),
 
                     SizedBox(height: 20),
                     SizedBox(
                       height: 47,
                       width: 400,
                       child: TextButton(
-                        onPressed: () async {
-                          try {
-                            final response = await loginUser(email, password);
-                            if (response.access_token != null &&
-                                response.access_token.isNotEmpty) {
-                              // Update provider with new token
-                              context.read<IsUserAuthProvider>().setToken(
-                                response.access_token,
-                              );
-                              upDatePrefs('token', response.access_token);
-                              // Navigate to dashboard - no need for condition since we know we have a token
-                              context.push('/dashboard');
-                              print(
-                                "Login successful with token: ${response.access_token}",
-                              );
-                            } else {
-                              // Handle failed login
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'Login failed - no token received',
-                                  ),
-                                ),
-                              );
-                            }
-                          } catch (e) {
-                            // Handle errors
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Login error: ${e.toString()}'),
-                              ),
-                            );
-                          }
-                        },
+                        onPressed:
+                            isLoading
+                                ? null
+                                : () async {
+                                  try {
+                                    final response = await loginUser(
+                                      email,
+                                      password,
+                                    );
+                                    context
+                                        .read<IsUserAuthProvider>()
+                                        .setIsLoading(true);
+                                    if (response.access_token != null &&
+                                        response.access_token.isNotEmpty) {
+                                      context
+                                          .read<IsUserAuthProvider>()
+                                          .setToken(response.access_token);
+                                      upDatePrefs(
+                                        'token',
+                                        response.access_token,
+                                      );
+                                      context.push('/dashboard');
+                                    } else {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            'Login failed - no token received',
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  } catch (e) {
+                                    // Handle errors
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          'Login error: ${e.toString()}',
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },
                         style: TextButton.styleFrom(
                           backgroundColor: Colors.green,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.all(Radius.circular(8)),
                           ),
                         ),
-                        child: Text(
-                          "LOGIN",
-                          style: TextStyle(color: Colors.white),
-                        ),
+                        child:
+                            isLoading
+                                ? Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "LOGIN",
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    SizedBox(width: 10),
+                                    SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 3,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                                : Text(
+                                  "LOGIN",
+                                  style: TextStyle(color: Colors.white),
+                                ),
                       ),
                     ),
                     SizedBox(height: 10),
@@ -267,6 +298,7 @@ class loginScreen extends State<Login> {
     String hint,
     Color inputColor,
     String input,
+    bool isPassword,
   ) {
     return ConstrainedBox(
       constraints: BoxConstraints(maxWidth: width),
@@ -280,6 +312,8 @@ class loginScreen extends State<Login> {
             }
           });
         },
+        obscureText: isPassword,
+        obscuringCharacter: '*',
         decoration: InputDecoration(
           hintText: hint,
           fillColor: inputColor,
