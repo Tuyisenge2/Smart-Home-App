@@ -442,7 +442,7 @@ class _deviceManagementState extends State<deviceManagement> {
                       ),
                     ],
                   ),
-                  !isCreatingDevice
+                  isCreatingDevice
                       ? uploadingButton(
                         Color(0xFFB9F249),
                         Colors.black,
