@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -9,7 +11,9 @@ import 'package:new_app/components/times_button.dart';
 import 'package:new_app/models/fetch_scene_response.dart';
 import 'package:new_app/provider/is_user_auth_provider.dart';
 import 'package:new_app/provider/scene_provider.dart';
+import 'package:new_app/services/create_service.dart';
 import 'package:new_app/services/fetch_service.dart';
+import 'package:new_app/util/snack_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -20,6 +24,29 @@ class CreateScene extends StatefulWidget {
 
 class _CreateScene extends State<CreateScene> {
   dynamic backendRes;
+  String name = '';
+  List daysOfWeek = [];
+  String startTime = '';
+  String endTime = '';
+  bool sendNofication = false;
+  //  bool? isActive;
+  List? devices;
+
+  String startHour = '12';
+  String startMinute = '00';
+  String startPeriod = 'AM';
+  String endHour = '12';
+  String endMinute = '00';
+  String endPeriod = 'AM';
+
+  List<String> hours = List.generate(
+    12,
+    (index) => (index + 1).toString().padLeft(2, '0'),
+  );
+  List<String> minutes = ['00', '15', '30', '45'];
+  List<String> periods = ['AM', 'PM'];
+  String getStartTime() => '$startHour:$startMinute $startPeriod';
+  String getEndTime() => '$endHour:$endMinute $endPeriod';
 
   @override
   void initState() {
@@ -31,34 +58,62 @@ class _CreateScene extends State<CreateScene> {
     try {
       SharedPreferences pref = await SharedPreferences.getInstance();
       String? token = pref.getString('token');
-
       dynamic sceneData = context.read<SceneProvider>().sceneData;
-
       if (token != null && sceneData.isEmpty) {
         SceneListResponse response = await fetchScenes(token);
-
         context.read<SceneProvider>().setSceneData(response.scenes);
       }
     } catch (e) {
       print('Error fetching scene data: mana $e');
+      throw Exception('Error fetching scene data');
     }
   }
 
-  Container circleDays(String l) {
-    return Container(
-      height: 35,
-      width: 35,
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(.2),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Center(
-        child: Text(
-          l,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w800,
+  Widget circleDays(String dayAbbreviation, StateSetter setModalState) {
+    // Map abbreviations to full day names (optional, you could just store abbreviations)
+    final dayMap = {
+      'M': 'Monday',
+      'T': 'Tuesday',
+      'W': 'Wednesday',
+      'Th': 'Thursday',
+      'F': 'Friday',
+      'S': 'Saturday',
+      'Su': 'Sunday',
+    };
+
+    final isSelected = daysOfWeek.contains(
+      dayMap[dayAbbreviation] ?? dayAbbreviation,
+    );
+
+    return InkWell(
+      onTap: () {
+        setModalState(() {
+          final dayName = dayMap[dayAbbreviation] ?? dayAbbreviation;
+          if (isSelected) {
+            daysOfWeek.remove(dayName);
+          } else {
+            daysOfWeek.add(dayName);
+          }
+        });
+      },
+      child: Container(
+        height: 35,
+        width: 35,
+        decoration: BoxDecoration(
+          color:
+              isSelected
+                  ? Color(0xFFB9F249) // Selected color
+                  : Colors.white.withOpacity(.2), // Unselected color
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Center(
+          child: Text(
+            dayAbbreviation,
+            style: TextStyle(
+              color: isSelected ? Colors.black : Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w800,
+            ),
           ),
         ),
       ),
@@ -149,6 +204,11 @@ class _CreateScene extends State<CreateScene> {
                         Flexible(
                           flex: 8,
                           child: TextField(
+                            onChanged: (value) {
+                              setState(() {
+                                name = value;
+                              });
+                            },
                             decoration: InputDecoration(
                               fillColor: Colors.white,
                               filled: true,
@@ -217,229 +277,304 @@ class _CreateScene extends State<CreateScene> {
       context: context,
       isScrollControlled: true,
       builder: (BuildContext context) {
-        return Container(
-          padding: EdgeInsets.only(
-            top: MediaQuery.of(context).size.height * 0.01,
-            left: MediaQuery.of(context).size.width * 0.03,
-            right: MediaQuery.of(context).size.width * 0.03,
-          ),
-          height: MediaQuery.of(context).size.height * 0.65,
-          width: double.infinity,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Container(
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).size.height * 0.006,
+                left: MediaQuery.of(context).size.width * 0.03,
+                right: MediaQuery.of(context).size.width * 0.03,
+              ),
+              height: MediaQuery.of(context).size.height * 0.8,
+              width: double.infinity,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  TimesButton(
-                    height: 20,
-                    width: 20,
-                    callback: () {
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TimesButton(
+                        height: 20,
+                        width: 20,
+                        callback: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  ),
+                  Center(
+                    child: Text(
+                      "Schedule",
+                      style: TextStyle(
+                        color: Color(0xFFB9F249),
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: 100,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Color(0xFF181D23),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.05,
+                            ),
+                            InkWell(
+                              child: Icon(
+                                Icons.repeat,
+                                color: Color(0xFFB9F249),
+                              ),
+                            ),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.02,
+                            ),
+                            Text(
+                              " Repeats Every",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          spacing: MediaQuery.of(context).size.width * 0.03,
+                          children: [
+                            circleDays('M', setModalState),
+                            circleDays('T', setModalState),
+                            circleDays('W', setModalState),
+                            circleDays('Th', setModalState),
+                            circleDays('F', setModalState),
+                            circleDays('S', setModalState),
+                            circleDays('Su', setModalState),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    height: 70,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Color(0xFF181D23),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Flexible(
+                          child: InkWell(
+                            child: SvgPicture.asset(
+                              'assets/icons/notifications.svg',
+                            ),
+                          ),
+                        ),
+                        Flexible(
+                          flex: 5,
+                          child: Text(
+                            "get notified on your phone when this routine starts ",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        Flexible(
+                          child: InkWell(
+                            onTap: () {
+                              setModalState(
+                                () => sendNofication = !sendNofication,
+                              );
+                            },
+                            child:
+                                sendNofication
+                                    ? SvgPicture.asset(
+                                      'assets/icons/toggleButtonOn.svg',
+                                    )
+                                    : SvgPicture.asset(
+                                      'assets/icons/toggleButton.svg',
+                                    ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: MediaQuery.of(context).size.width * 0.03,
+                    ),
+                    height: 90,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Color(0xFF181D23),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              'Start Time',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
+                            ),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.35,
+                            ),
+
+                            Text(
+                              'End Time',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Text(
+                              'From',
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Colors.white,
+                              ),
+                            ),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.02,
+                            ),
+                            // Start Hour Dropdown
+                            _buildTimeDropdown(
+                              value: startHour,
+                              items: hours,
+                              textColor: Color(0xFFB9F249),
+                              onChanged:
+                                  (value) =>
+                                      setModalState(() => startHour = value!),
+                            ),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.02,
+                            ),
+                            Text(
+                              ':',
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Color(0xFFB9F249),
+                              ),
+                            ),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.02,
+                            ),
+                            // Start Minute Dropdown
+                            _buildTimeDropdown(
+                              value: startMinute,
+                              items: minutes,
+                              textColor: Color(0xFFB9F249),
+                              onChanged:
+                                  (value) =>
+                                      setModalState(() => startMinute = value!),
+                            ),
+                            SizedBox(width: 1),
+
+                            // Start Period Dropdown
+                            _buildTimeDropdown(
+                              value: startPeriod,
+                              items: periods,
+                              onChanged:
+                                  (value) =>
+                                      setModalState(() => startPeriod = value!),
+                            ),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.09,
+                            ),
+                            Text(
+                              'To',
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Colors.white,
+                              ),
+                            ),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.02,
+                            ),
+                            // End Hour Dropdown
+                            _buildTimeDropdown(
+                              value: endHour,
+                              items: hours,
+                              textColor: Color(0xFFB9F249),
+                              onChanged:
+                                  (value) =>
+                                      setModalState(() => endHour = value!),
+                            ),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.02,
+                            ),
+                            Text(
+                              ':',
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Color(0xFFB9F249),
+                              ),
+                            ),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.02,
+                            ),
+                            // End Minute Dropdown
+                            _buildTimeDropdown(
+                              value: endMinute,
+                              items: minutes,
+                              textColor: Color(0xFFB9F249),
+                              onChanged:
+                                  (value) =>
+                                      setModalState(() => endMinute = value!),
+                            ),
+                            SizedBox(width: 1),
+                            // End Period Dropdown
+                            _buildTimeDropdown(
+                              value: endPeriod,
+                              items: periods,
+                              onChanged:
+                                  (value) =>
+                                      setModalState(() => endPeriod = value!),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  Customizedbutton(
+                    label: 'Continue',
+                    labelColor: Colors.black,
+                    buttonColor: Color(0xFFB9F249),
+                    bottomModal: () {
+                      Navigator.of(context).pop();
+                      createSceneThirdModal();
+                    },
+                  ),
+                  Customizedbutton(
+                    label: 'Back',
+                    labelColor: Color(0xFFB9F249),
+                    buttonColor: Color(0xFF31373C),
+                    bottomModal: () {
                       Navigator.of(context).pop();
                     },
                   ),
                 ],
               ),
-              Center(
-                child: Text(
-                  "Schedule",
-                  style: TextStyle(
-                    color: Color(0xFFB9F249),
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-              Container(
-                height: 100,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Color(0xFF181D23),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Row(
-                      children: [
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.05,
-                        ),
-                        InkWell(
-                          child: Icon(Icons.repeat, color: Color(0xFFB9F249)),
-                        ),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.02,
-                        ),
-                        Text(
-                          " Repeats Every",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      spacing: MediaQuery.of(context).size.width * 0.03,
-                      children: [
-                        circleDays('M'),
-                        circleDays('T'),
-                        circleDays('W'),
-                        circleDays('T'),
-                        circleDays('F'),
-                        circleDays('S'),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                height: 70,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Color(0xFF181D23),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Flexible(
-                      child: InkWell(
-                        child: SvgPicture.asset(
-                          'assets/icons/notifications.svg',
-                        ),
-                      ),
-                    ),
-                    Flexible(
-                      flex: 5,
-                      child: Text(
-                        "get notified on your phone when this routine starts ",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    Flexible(
-                      child: SvgPicture.asset('assets/icons/toggleButton.svg'),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: MediaQuery.of(context).size.width * 0.03,
-                ),
-                height: 70,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: Color(0xFF181D23),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Start Time',
-                          style: TextStyle(color: Colors.white, fontSize: 16),
-                        ),
-                        Text(
-                          'End Time',
-                          style: TextStyle(color: Colors.white, fontSize: 16),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Text(
-                          'From',
-                          style: TextStyle(fontSize: 15, color: Colors.white),
-                        ),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.03,
-                        ),
-                        Text(
-                          '12.00',
-                          style: TextStyle(
-                            fontSize: 15,
-                            color: Color(0xFFB9F249),
-                          ),
-                        ),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.01,
-                        ),
-                        Text(
-                          'AM',
-                          style: TextStyle(fontSize: 15, color: Colors.white),
-                        ),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.01,
-                        ),
-                        SvgPicture.asset(
-                          'assets/icons/dropDown.svg',
-                          height: 7,
-                          width: 7,
-                        ),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.12,
-                        ),
-                        Text(
-                          'To',
-                          style: TextStyle(fontSize: 15, color: Colors.white),
-                        ),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.12,
-                        ),
-                        Text(
-                          '12.00',
-                          style: TextStyle(
-                            fontSize: 15,
-                            color: Color(0xFFB9F249),
-                          ),
-                        ),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.01,
-                        ),
-                        Text(
-                          'AM',
-                          style: TextStyle(fontSize: 15, color: Colors.white),
-                        ),
-                        SizedBox(
-                          width: MediaQuery.of(context).size.width * 0.01,
-                        ),
-                        SvgPicture.asset(
-                          'assets/icons/dropDown.svg',
-                          height: 7,
-                          width: 7,
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              Customizedbutton(
-                label: 'Continue',
-                labelColor: Colors.black,
-                buttonColor: Color(0xFFB9F249),
-                bottomModal: () {
-                  Navigator.of(context).pop();
-                  createSceneThirdModal();
-                },
-              ),
-              Customizedbutton(
-                label: 'Back',
-                labelColor: Color(0xFFB9F249),
-                buttonColor: Color(0xFF31373C),
-                bottomModal: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
@@ -528,9 +663,36 @@ class _CreateScene extends State<CreateScene> {
                 label: 'Continue',
                 labelColor: Colors.black,
                 buttonColor: Color(0xFFB9F249),
-                bottomModal: () {
-                  Navigator.of(context).pop();
-                  createSceneFoufthModal();
+                bottomModal: () async {
+                  try {
+                    SharedPreferences pref =
+                        await SharedPreferences.getInstance();
+                    String? token = pref.getString('token');
+                    // print(
+                    //   ' resonpppppppppppppppppppppppppppppppppppppp $name $daysOfWeek $startTime $endTime $sendNofication  $token ',
+                    // );
+                    dynamic response = await createScene(
+                      name,
+                      daysOfWeek,
+                      convertTo24HourFormat(getStartTime()),
+                      convertTo24HourFormat(getEndTime()),
+                      sendNofication,
+                      token!,
+                      [],
+                    );
+                    if (response['status'] == true) {
+                      showTopSnackBar(
+                        context,
+                        'Scene created successful!',
+                        Colors.green,
+                      );
+                    }
+
+                    Navigator.of(context).pop();
+                    createSceneFoufthModal();
+                  } catch (e) {
+                    throw Exception('Failed to create scene');
+                  }
                 },
               ),
               Customizedbutton(
@@ -824,5 +986,48 @@ class _CreateScene extends State<CreateScene> {
         ),
       ),
     );
+  }
+
+  Widget _buildTimeDropdown({
+    required String value,
+    required List<String> items,
+    required Function(String?) onChanged,
+    Color textColor = Colors.white,
+  }) {
+    return DropdownButton<String>(
+      value: value,
+      underline: Container(), // Remove default underline
+      dropdownColor: Color(0xFF181D23),
+      icon: SvgPicture.asset('assets/icons/dropDown.svg', height: 7, width: 7),
+      style: TextStyle(fontSize: 15, color: textColor),
+      onChanged: onChanged,
+      items:
+          items.map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(value: value, child: Text(value));
+          }).toList(),
+    );
+  }
+
+  String convertTo24HourFormat(String time12Hour) {
+    try {
+      final parts = time12Hour.split(' ');
+      final timePart = parts[0];
+      final period = parts[1].toUpperCase();
+
+      final timeComponents = timePart.split(':');
+      var hour = int.parse(timeComponents[0]);
+      final minute = timeComponents[1];
+
+      if (period == 'PM' && hour != 12) {
+        hour += 12;
+      } else if (period == 'AM' && hour == 12) {
+        hour = 0;
+      }
+
+      return '${hour.toString().padLeft(2, '0')}:$minute';
+    } catch (e) {
+      print('Error converting time format: $e');
+      return time12Hour; // fallback
+    }
   }
 }

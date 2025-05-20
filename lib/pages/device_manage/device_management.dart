@@ -31,7 +31,7 @@ class _deviceManagementState extends State<deviceManagement> {
   bool livRoom = false;
   File? _imageFile;
   String images_url = '';
-  bool uploadImage = false;
+  bool showUploadingButtonImage = false;
   bool isUploadingImage = false;
   bool isCreatingDevice = false;
   void getDevicesData() async {
@@ -123,7 +123,7 @@ class _deviceManagementState extends State<deviceManagement> {
                   ),
                   Center(
                     child: Text(
-                      "Light",
+                      "Device Image",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 25,
@@ -131,59 +131,61 @@ class _deviceManagementState extends State<deviceManagement> {
                       ),
                     ),
                   ),
-
-                  Container(
-                    width: 80,
-                    height: 80,
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                    //
-                    child: SvgPicture.asset('assets/icons/sun.svg'),
-                  ),
-
-                  !uploadImage
-                      ? Customizedbutton(
-                        label: 'Select from Gallery',
-                        labelColor: Colors.black,
-                        buttonColor: Color(0xFFB9F249),
-                        bottomModal: () async {
-                          _imageFile = await cloud.pickImage(
-                            ImageSource.gallery,
-                          );
-                          setModalState(() {
-                            uploadImage = !uploadImage;
-                          });
-                        },
-                      )
-                      : isUploadingImage
-                      ? uploadingButton(
-                        Color(0xFFB9F249),
-                        Colors.black,
-                        ' uploading ',
-                      )
-                      : Customizedbutton(
-                        label: 'Upload Image',
-                        labelColor: Colors.black,
-                        buttonColor: Color(0xFFB9F249),
-                        bottomModal: () async {
-                          setModalState(() {
-                            isUploadingImage = true;
-                          });
-                          images_url =
-                              await cloud.uploadImage(_imageFile!) ?? '';
-                          setModalState(() {
-                            uploadImage = !uploadImage;
-                            isUploadingImage = false;
-                          });
-                          Navigator.of(context).pop();
-                          //Future.delayed(Duration(milliseconds: 300), () {
-                          creatSceneSecondModal();
-                          //});
-                        },
+                  if (_imageFile != null) ...[
+                    Container(
+                      width: 80,
+                      height: 80,
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(100),
                       ),
+                      //
+                      child: Image.file(_imageFile!),
+                      // SvgPicture.asset('assets/icons/sun.svg'),
+                    ),
+                  ],
+                  pickImageButton(
+                    ImageSource.camera,
+                    'Take a Photo',
+                    setModalState,
+                  ),
+                  pickImageButton(
+                    ImageSource.gallery,
+                    'Select from Your Gallery',
+                    setModalState,
+                  ),
+                  showUploadingButtonImage
+                      ? isUploadingImage
+                          ? uploadingButton(
+                            Color(0xFFB9F249),
+                            Colors.black,
+                            ' uploading ',
+                          )
+                          : Customizedbutton(
+                            label: 'Upload Image',
+                            labelColor: Colors.black,
+                            buttonColor: Color(0xFFB9F249),
+                            bottomModal: () async {
+                              setModalState(() {
+                                isUploadingImage = true;
+                              });
+                              images_url =
+                                  await cloud.uploadImage(_imageFile!) ?? '';
+
+                              setModalState(() {
+                                showUploadingButtonImage =
+                                    !showUploadingButtonImage;
+                                isUploadingImage = false;
+                                _imageFile = null;
+                              });
+                              Navigator.of(context).pop();
+                              //Future.delayed(Duration(milliseconds: 300), () {
+                              creatSceneSecondModal();
+                              //});
+                            },
+                          )
+                      : SizedBox.shrink(),
                 ],
               ),
             );
@@ -261,60 +263,62 @@ class _deviceManagementState extends State<deviceManagement> {
                     ),
                   ),
 
-                  Container(
-                    height: 50,
-                    width: 190,
-                    decoration: BoxDecoration(
-                      color: Color(0xFF181D23),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Living Room',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    height: 50,
-                    width: 190,
-                    decoration: BoxDecoration(
-                      color: Color(0xFF181D23),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Bed Room',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    height: 50,
-                    width: 190,
-                    decoration: BoxDecoration(
-                      color: Color(0xFF181D23),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Kitchen',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 17,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ),
-                  ),
+                  // Container(
+                  //   height: 50,
+                  //   width: 190,
+                  //   decoration: BoxDecoration(
+                  //     color: Color(0xFF181D23),
+                  //     borderRadius: BorderRadius.circular(14),
+                  //   ),
+                  //   child: Center(
+                  //     child: Text(
+                  //       'Living Room',
+                  //       style: TextStyle(
+                  //         color: Colors.white,
+                  //         fontSize: 17,
+                  //         fontWeight: FontWeight.w800,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                  // Container(
+                  //   height: 50,
+                  //   width: 190,
+                  //   decoration: BoxDecoration(
+                  //     color: Color(0xFF181D23),
+                  //     borderRadius: BorderRadius.circular(14),
+                  //   ),
+                  //   child: Center(
+                  //     child: Text(
+                  //       'Bed Room',
+                  //       style: TextStyle(
+                  //         color: Colors.white,
+                  //         fontSize: 17,
+                  //         fontWeight: FontWeight.w800,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                  // Container(
+                  //   height: 50,
+                  //   width: 190,
+                  //   decoration: BoxDecoration(
+                  //     color: Color(0xFF181D23),
+                  //     borderRadius: BorderRadius.circular(14),
+                  //   ),
+                  //   child: Center(
+                  //     child: Text(
+                  //       'Kitchen',
+                  //       style: TextStyle(
+                  //         color: Colors.white,
+                  //         fontSize: 17,
+                  //         fontWeight: FontWeight.w800,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+
+
 
                   Customizedbutton(
                     label: 'Continue',
@@ -541,7 +545,7 @@ class _deviceManagementState extends State<deviceManagement> {
                   ),
 
                   Text(
-                    "\"Masterbed\" ",
+                    "\"room 1\" ",
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 22,
@@ -577,9 +581,7 @@ class _deviceManagementState extends State<deviceManagement> {
   @override
   Widget build(BuildContext context) {
     dynamic deviceData = context.watch<DeviceProvider>().deviceData;
-    print(
-      '44444444444444444444444444444444444444444444444444444444 4ouivbjintwreewpqqqqqqqqqqqqqqqqqppppppppppppppqwssssssssssssssssssssssssssssssss $deviceData ',
-    );
+
     return Scaffold(
       backgroundColor: Colors.white.withOpacity(.1),
       body: SizedBox(
@@ -630,7 +632,7 @@ class _deviceManagementState extends State<deviceManagement> {
                   Column(
                     children: [
                       SizedBox(
-                        height: MediaQuery.of(context).size.height * 0.45,
+                        height: MediaQuery.of(context).size.height * 0.6,
                         child: ListView.builder(
                           itemCount: (deviceData.length / 2).ceil(),
                           itemBuilder: (context, rowIndex) {
@@ -725,5 +727,25 @@ class _deviceManagementState extends State<deviceManagement> {
         ),
       ),
     );
+  }
+
+  dynamic pickImageButton(
+    ImageSource imageSource,
+    String label,
+    StateSetter setModalState,
+  ) {
+    return !showUploadingButtonImage
+        ? Customizedbutton(
+          label: label,
+          labelColor: Colors.black,
+          buttonColor: Color(0xFFB9F249),
+          bottomModal: () async {
+            _imageFile = await cloud.pickImage(imageSource);
+            setModalState(() {
+              showUploadingButtonImage = !showUploadingButtonImage;
+            });
+          },
+        )
+        : SizedBox.shrink();
   }
 }

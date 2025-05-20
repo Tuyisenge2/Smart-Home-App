@@ -3,8 +3,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:http/http.dart' as apiService;
-import 'package:new_app/services/api_service.dart';
 
 Future<dynamic> signupUser(
   String email,
@@ -68,6 +66,56 @@ Future<dynamic> createDevice(
     }
   } catch (e) {
     print('Error Creating device: $e');
+    throw Exception('Failed to load device creation response: $e');
+  }
+}
+
+Future<dynamic> createScene(
+  String name,
+  List daysOfWeek,
+  String startTime,
+  String endTime,
+  bool sendNofication,
+  String token,
+  List? devices,
+) async {
+  try {
+    if (name.isEmpty) {
+      throw Exception('Name is required');
+    }
+    if (startTime.isEmpty) {
+      throw Exception('Start time is required');
+    }
+    if (endTime.isEmpty) {
+      throw Exception('End time is required');
+    }
+
+    final response = await http.post(
+      Uri.parse('http://10.0.2.2:8000/api/scenes'),
+      headers: <String, String>{
+        'Content-Type': 'application/json;charset=UTF-8',
+        HttpHeaders.authorizationHeader: "Bearer $token",
+      },
+      body: jsonEncode(<String, dynamic>{
+        'name': name,
+        'days_of_week': daysOfWeek,
+        'start_time': startTime,
+        'end_time': endTime,
+        'send_notification': sendNofication,
+        'is_active': false,
+        'devices': [18],
+      }),
+    );
+    // print('Status Codeeeeeeeeeeeeeeeeeeeeee: ${response.statusCode}');
+    // print('Headersdddddddddddddddddddddddddddd: ${response.headers}');
+    // print('Bodyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy: ${response.body}');
+    if (response.statusCode == 201) {
+      return {'message': 'Scenes created successfully', 'status': true};
+    } else if (response.statusCode == 200) {
+      return {'message': 'Scenes created successfully', 'status': true};
+    }
+  } catch (e) {
+    print('Error Creating Scenes: $e');
     throw Exception('Failed to load device creation response: $e');
   }
 }

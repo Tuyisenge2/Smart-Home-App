@@ -5,11 +5,6 @@ import 'package:new_app/services/fetch_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// import 'dart:convert';
-// import 'dart:io';
-// import 'package:http/http.dart' as http;
-// import 'package:new_app/models/devices_model.dart';
-// import 'package:new_app/models/fetch_device_response.dart';
 
 // Future<FetchDeviceResponse> fetchDevices(String token) async {
 //   try {

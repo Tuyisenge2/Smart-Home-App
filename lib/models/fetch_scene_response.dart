@@ -8,7 +8,7 @@ class FetchSceneResponse {
   final String start_time;
   final String end_time;
   final bool send_notification;
-  final Map<String, dynamic> device_states;
+  final List<dynamic> devices;
   final bool is_active;
   final String? created_at;
   final String? updated_at;
@@ -24,7 +24,7 @@ FetchSceneResponse {
   start_time: $start_time,
   end_time: $end_time,
   send_notification: $send_notification,
-  device_states: $device_states,
+  devices: $devices,
   is_active: $is_active,
   created_at: $created_at,
   updated_at: $updated_at,
@@ -39,7 +39,7 @@ FetchSceneResponse {
     required this.start_time,
     required this.end_time,
     required this.send_notification,
-    required this.device_states,
+    required this.devices,
     required this.is_active,
     required this.user_id,
     this.created_at,
@@ -54,7 +54,7 @@ FetchSceneResponse {
       start_time: json['start_time'],
       end_time: json['end_time'],
       send_notification: json['send_notification'],
-      device_states: json['device_states'],
+      devices: json['devices'],
       is_active: json['is_active'],
       user_id: json['user_id'],
       created_at: json['created_at'],
