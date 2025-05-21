@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:new_app/components/customizedButton.dart';
 import 'package:new_app/components/device_card.dart';
 import 'package:new_app/components/times_button.dart';
+import 'package:new_app/helper/sql_helper.dart';
 import 'package:new_app/models/fetch_device_response.dart';
 import 'package:new_app/provider/device_provider.dart';
 import 'package:new_app/services/create_service.dart';
@@ -34,6 +35,27 @@ class _deviceManagementState extends State<deviceManagement> {
   bool showUploadingButtonImage = false;
   bool isUploadingImage = false;
   bool isCreatingDevice = false;
+  List<Map<String, dynamic>> currentDevice = [];
+  bool hasExistingData = false;
+
+  void fetchDataSqlLite() async {
+    final data = await SQLHelper.getDevices();
+    setState(() {
+      currentDevice = data;
+      if (data.isNotEmpty) {
+        final firstDevice = data.first;
+        name = firstDevice['name'] ?? '';
+        room_id = firstDevice['roomId'] ?? 0;
+        images_url = firstDevice['imageUrl'] ?? '';
+        livRoom = room_id == 1;
+        hasExistingData = currentDevice.isNotEmpty;
+        print(
+          '${currentDevice[0]}  $name $room_id  second image deletereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeyyyyyyyyyyyyyyyyyyyyyyooooooooooppppppppppppppqqqqqqqqqqqqqqqqqqqqqqq',
+        );
+      }
+    });
+  }
+
   void getDevicesData() async {
     try {
       SharedPreferences pref = await SharedPreferences.getInstance();
@@ -48,49 +70,16 @@ class _deviceManagementState extends State<deviceManagement> {
     }
   }
 
-  Container circleDays(String l) {
-    return Container(
-      height: 35,
-      width: 35,
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(.2),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Center(
-        child: Text(
-          l,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Container deviceTextCont(String l) {
-    return Container(
-      height: 25,
-      width: 135,
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(.1),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Center(
-        child: Text(
-          l,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-      ),
-    );
+  @override
+  void initState() {
+    super.initState();
+    fetchDataSqlLite();
   }
 
   void bottomModal() {
+    // print(
+    //   'second image rurlllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll $currentDevice',
+    // );
     showModalBottomSheet(
       barrierColor: Colors.transparent,
       backgroundColor: Color(0xFF31373C),
@@ -172,7 +161,15 @@ class _deviceManagementState extends State<deviceManagement> {
                               });
                               images_url =
                                   await cloud.uploadImage(_imageFile!) ?? '';
-
+                              hasExistingData
+                                  ? await _updateDevice(
+                                    null,
+                                    null,
+                                    null,
+                                    currentDevice[0]['imageUrl'],
+                                    images_url,
+                                  )
+                                  : await _addDevice('', 0, images_url);
                               setModalState(() {
                                 showUploadingButtonImage =
                                     !showUploadingButtonImage;
@@ -195,7 +192,136 @@ class _deviceManagementState extends State<deviceManagement> {
     );
   }
 
+  void EditImageModal() {
+    // print(
+    //   'second image rurlllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll $currentDevice',
+    // );
+    showModalBottomSheet(
+      barrierColor: Colors.transparent,
+      backgroundColor: Color(0xFF31373C),
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Container(
+              padding: EdgeInsets.only(
+                left: MediaQuery.of(context).size.width * 0.03,
+                right: MediaQuery.of(context).size.width * 0.03,
+              ),
+              height: MediaQuery.of(context).size.height * 0.6,
+              width: double.infinity,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TimesButton(
+                        height: 20,
+                        width: 20,
+                        callback: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  ),
+                  Center(
+                    child: Text(
+                      "Selected Image",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 25,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+
+                  if (hasExistingData) ...[
+                    // Show existing device info
+                    Container(
+                      width: 80,
+                      height: 80,
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.2),
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                      child:
+                          images_url.isNotEmpty
+                              ? Image.network(images_url)
+                              : Icon(Icons.device_hub, color: Colors.white),
+                    ),
+                    Text(
+                      name,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      "Room: ${room_id == 1 ? 'Living Room' : 'Other'}",
+                      style: TextStyle(color: Colors.white, fontSize: 16),
+                    ),
+                    SizedBox(height: 20),
+                  ],
+                  Customizedbutton(
+                    label: 'Continue',
+                    labelColor: Colors.black,
+                    buttonColor: Color(0xFFB9F249),
+                    bottomModal: () {
+                      Navigator.of(context).pop();
+                      creatSceneSecondModal();
+                    },
+                  ),
+                  Customizedbutton(
+                    label: 'Edit',
+                    labelColor: Colors.black,
+                    buttonColor: Color(0xFFB9F249),
+                    bottomModal: () {
+                      Navigator.of(context).pop();
+                      bottomModal();
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Future<void> _addDevice(String name, int roomId, String imageUrl) async {
+    final res = await SQLHelper.createDevice(name, roomId, imageUrl);
+    print(
+      'imrageeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr $res',
+    );
+    fetchDataSqlLite();
+  }
+
+  Future<void> _updateDevice(
+    int? id,
+    String? name,
+    int? roomId,
+    String? imageUrl,
+    String? newImageUrl,
+  ) async {
+    await SQLHelper.updateDevice(id, name, roomId, imageUrl, newImageUrl);
+    fetchDataSqlLite();
+  }
+
+  void _deleteDevice(String imageUrl) async {
+    await SQLHelper.deleteDevice(imageUrl);
+    fetchDataSqlLite();
+  }
+
   void creatSceneSecondModal() {
+    // print(
+    //   'second image rurlllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll $currentDevice',
+    // );
+
     showModalBottomSheet(
       barrierColor: Colors.transparent,
       backgroundColor: Color(0xFF31373C),
@@ -237,11 +363,12 @@ class _deviceManagementState extends State<deviceManagement> {
                     ),
                   ),
                   InkWell(
-                    onTap: () {
+                    onTap: () async {
                       setModalState(() {
                         livRoom = !livRoom;
                         room_id = 1;
                       });
+                      await _updateDevice(2, null, 1, images_url, null);
                     },
                     child: Container(
                       height: 50,
@@ -317,9 +444,6 @@ class _deviceManagementState extends State<deviceManagement> {
                   //     ),
                   //   ),
                   // ),
-
-
-
                   Customizedbutton(
                     label: 'Continue',
                     labelColor: Colors.black,
@@ -339,6 +463,8 @@ class _deviceManagementState extends State<deviceManagement> {
   }
 
   void createSceneThirdModal() {
+    TextEditingController nameController = TextEditingController(text: name);
+
     showModalBottomSheet(
       barrierColor: Colors.transparent,
       backgroundColor: Color(0xFF31373C),
@@ -404,12 +530,21 @@ class _deviceManagementState extends State<deviceManagement> {
                             Flexible(
                               flex: 8,
                               child: TextField(
-                                onChanged: (value) {
+                                controller: nameController,
+                                onChanged: (value) async {
                                   setState(() {
                                     name = value;
                                   });
+                                  await _updateDevice(
+                                    null,
+                                    value,
+                                    null,
+                                    images_url,
+                                    null,
+                                  );
                                 },
                                 decoration: InputDecoration(
+                                  hintText: name,
                                   fillColor: Colors.white,
                                   filled: true,
                                   border: InputBorder.none,
@@ -479,9 +614,11 @@ class _deviceManagementState extends State<deviceManagement> {
                                 'Device created successful!',
                                 Colors.green,
                               );
+                              _deleteDevice(images_url);
+                              hasExistingData = false;
+                              _resetFormData();
                               Navigator.of(context).pop();
                               getDevicesData();
-
                               createSceneFoufthModal(name);
                             }
                           } catch (e) {
@@ -504,6 +641,9 @@ class _deviceManagementState extends State<deviceManagement> {
   }
 
   void createSceneFoufthModal(String name) {
+    // print(
+    //   'second image rurlllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllll $currentDevice',
+    // );
     showModalBottomSheet(
       barrierColor: Colors.transparent,
       backgroundColor: Color(0xFF31373C),
@@ -680,10 +820,10 @@ class _deviceManagementState extends State<deviceManagement> {
 
                   Spacer(),
                   Customizedbutton(
-                    label: 'Add Device',
+                    label: hasExistingData ? 'Edit Device' : 'Add Device',
                     labelColor: Colors.black,
                     buttonColor: Color(0xFFB9F249),
-                    bottomModal: bottomModal,
+                    bottomModal: hasExistingData ? EditImageModal : bottomModal,
                   ),
                 ],
               ),
@@ -747,5 +887,20 @@ class _deviceManagementState extends State<deviceManagement> {
           },
         )
         : SizedBox.shrink();
+  }
+
+  void _resetFormData() {
+    setState(() {
+      //  CloudinaryUtils cloud = CloudinaryUtils();
+      name = '';
+      room_id = 0;
+      livRoom = false;
+      //  File? _imageFile;
+      images_url = '';
+      showUploadingButtonImage = false;
+      isUploadingImage = false;
+      isCreatingDevice = false;
+      currentDevice = [];
+    });
   }
 }

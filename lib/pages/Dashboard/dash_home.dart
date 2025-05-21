@@ -65,12 +65,6 @@ class _DashHomeState extends State<DashHome> {
 
   @override
   Widget build(BuildContext context) {
-    String userName =
-        Provider.of<UserProvider>(context, listen: false).userName;
-    String myToken = Provider.of<IsUserAuthProvider>(context).token;
-    print("Token is $myToken");
-    print("User name is $userName");
-
     dynamic sceneData = context.watch<SceneProvider>().sceneData;
     dynamic deviceData = context.watch<DeviceProvider>().deviceData;
 
@@ -415,7 +409,7 @@ class _DashHomeState extends State<DashHome> {
                           ),
                         )
                         : ListView.builder(
-                          itemCount: 3,
+                          itemCount: sceneData?.length ?? 0,
                           itemBuilder: (context, index) {
                             final currentScene = sceneData[index];
                             return Padding(
@@ -430,6 +424,7 @@ class _DashHomeState extends State<DashHome> {
                                         : 'assets/icons/moon.svg',
                                 togglePath: 'assets/icons/toggleButton.svg',
                                 isActive: currentScene.is_active,
+                                id: currentScene.id,
                               ),
                             );
                           },
@@ -467,13 +462,12 @@ class _DashHomeState extends State<DashHome> {
                                     deviceData[firstIndex].images_url != ''
                                         ? deviceData[firstIndex].images_url
                                         : 'assets/images/AirCond.png',
-                                id: 1,
+                                id: deviceData[firstIndex].id,
                                 isActive: deviceData[firstIndex].is_active,
                               ),
                               if (firstIndex + 1 < deviceData.length)
                                 DeviceCard(
-                                  id: 1,
-
+                                  id: deviceData[firstIndex + 1].id,
                                   name: deviceData[firstIndex + 1].Device_name,
                                   imageUrl:
                                       deviceData[firstIndex].images_url != ''

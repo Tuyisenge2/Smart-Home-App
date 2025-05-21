@@ -268,7 +268,7 @@ class _SignupState extends State<Signup> {
           setState(() {
             if (input == 'email') {
               email = value;
-            } else if (input == 'password') {
+            } else if (input == 'password' ) {
               password = value;
             } else if (input == 'confirmPassword') {
               confirmPassword = value;
@@ -277,6 +277,8 @@ class _SignupState extends State<Signup> {
             }
           });
         },
+         obscureText: input == 'password',
+        obscuringCharacter: '*',
         decoration: InputDecoration(
           hintText: hint,
           fillColor: inputColor,

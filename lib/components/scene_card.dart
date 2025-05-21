@@ -1,16 +1,25 @@
+// ignore_for_file: unused_local_variable
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:new_app/services/fetchDevice.dart';
+import 'package:new_app/services/fetch_service.dart';
+import 'package:new_app/util/snack_bar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SceneCard extends StatefulWidget {
   final String sceneMess;
   final String iconPath;
   final String togglePath;
   final bool isActive;
+  final int id;
   const SceneCard({
+    super.key,
     required this.sceneMess,
     required this.iconPath,
     required this.togglePath,
     required this.isActive,
+    required this.id,
   });
 
   @override
@@ -55,7 +64,28 @@ class _SceneCardState extends State<SceneCard> {
           Expanded(
             flex: 1,
             child: IconButton(
-              onPressed: () {},
+              onPressed: () async {
+                try {
+                  SharedPreferences pref =
+                      await SharedPreferences.getInstance();
+                  String? token = pref.getString('token');
+                  dynamic res = await updateScenes(
+                    token!,
+                    !widget.isActive,
+                    widget.id,
+                  );
+                  await deviceUtils.getSceneData(context);
+                  showTopSnackBar(
+                    context,
+                    'Scene updated successful!',
+                    Colors.green,
+                  );
+                  await deviceUtils.getDevicesData(context);
+                } catch (e) {
+                  print('Error updating device: $e');
+                  throw Exception('Error updating device');
+                }
+              },
               icon:
                   widget.isActive
                       ? SvgPicture.asset('assets/icons/toggleButtonOn.svg')

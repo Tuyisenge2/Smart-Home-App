@@ -14,6 +14,7 @@ import 'package:new_app/provider/scene_provider.dart';
 import 'package:new_app/services/create_service.dart';
 import 'package:new_app/services/fetch_service.dart';
 import 'package:new_app/util/snack_bar.dart';
+import 'package:new_app/util/utils.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -59,15 +60,17 @@ class _CreateScene extends State<CreateScene> {
       SharedPreferences pref = await SharedPreferences.getInstance();
       String? token = pref.getString('token');
       dynamic sceneData = context.read<SceneProvider>().sceneData;
-      if (token != null && sceneData.isEmpty) {
+      if (token != null) {
         SceneListResponse response = await fetchScenes(token);
         context.read<SceneProvider>().setSceneData(response.scenes);
       }
     } catch (e) {
-      print('Error fetching scene data: mana $e');
+      print('Error fetching scene data:  $e');
       throw Exception('Error fetching scene data');
     }
   }
+
+  Utils utils = Utils();
 
   Widget circleDays(String dayAbbreviation, StateSetter setModalState) {
     // Map abbreviations to full day names (optional, you could just store abbreviations)
@@ -486,7 +489,6 @@ class _CreateScene extends State<CreateScene> {
                                       setModalState(() => startMinute = value!),
                             ),
                             SizedBox(width: 1),
-
                             // Start Period Dropdown
                             _buildTimeDropdown(
                               value: startPeriod,
@@ -680,14 +682,15 @@ class _CreateScene extends State<CreateScene> {
                       token!,
                       [],
                     );
-                    if (response['status'] == true) {
+                    if (response['status'] == true) {   
                       showTopSnackBar(
                         context,
                         'Scene created successful!',
                         Colors.green,
                       );
+                      _resetFormData();
+                      await utils.getSceneData(context);
                     }
-
                     Navigator.of(context).pop();
                     createSceneFoufthModal();
                   } catch (e) {
@@ -967,6 +970,7 @@ class _CreateScene extends State<CreateScene> {
                                             : 'assets/icons/moon.svg',
                                     togglePath: 'assets/icons/toggleButton.svg',
                                     isActive: currentScene.is_active,
+                                    id: currentScene.id,
                                   ),
                                 );
                               },
@@ -1029,5 +1033,20 @@ class _CreateScene extends State<CreateScene> {
       print('Error converting time format: $e');
       return time12Hour; // fallback
     }
+  }
+
+  void _resetFormData() {
+    setState(() {
+      name = '';
+      daysOfWeek = [];
+      startHour = '12';
+      startMinute = '00';
+      startPeriod = 'AM';
+      endHour = '12';
+      endMinute = '00';
+      endPeriod = 'AM';
+      sendNofication = false;
+      devices = null;
+    });
   }
 }

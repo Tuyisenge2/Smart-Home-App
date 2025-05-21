@@ -1,9 +1,12 @@
+// ignore_for_file: unused_local_variable
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:new_app/models/fetch_device_response.dart';
 import 'package:new_app/provider/device_provider.dart';
 import 'package:new_app/services/fetchDevice.dart' show deviceUtils;
 import 'package:new_app/services/fetch_service.dart';
+import 'package:new_app/util/snack_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -25,7 +28,6 @@ class DeviceCard extends StatefulWidget {
 
 class _DeviceCardState extends State<DeviceCard> {
   bool isToggleOn = false;
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -42,10 +44,14 @@ class _DeviceCardState extends State<DeviceCard> {
         children: [
           Padding(
             padding: EdgeInsets.only(left: 140.0),
-            child: InkWell(child: SvgPicture.asset('assets/icons/less2.svg')),
+            child: InkWell(
+              onTap: () {},
+              child: SvgPicture.asset('assets/icons/less2.svg'),
+            ),
           ),
-          //    Image.asset( widget.imageUrl?? 'assets/images/AirCond.png'),
-          Image.network(widget.imageUrl, height: 50, width: 120),
+          //   Image.asset( widget.imageUrl?? 'assets/images/AirCond.png'),
+          // Image.network(widget.imageUrl, height: 50, width: 120),
+          buildImageWidget(),
           Text(
             widget.name,
             style: TextStyle(
@@ -67,16 +73,18 @@ class _DeviceCardState extends State<DeviceCard> {
                   SharedPreferences pref =
                       await SharedPreferences.getInstance();
                   String? token = pref.getString('token');
-                  print(
-                    'dataaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaatrryyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy ,$token ${widget.isActive} ${widget.id}   ',
-                  );
+
                   dynamic res = await updateDevice(
                     token!,
                     !widget.isActive,
                     widget.id,
                   );
-                  //  getDevicesData();
                   await deviceUtils.getDevicesData(context);
+                  showTopSnackBar(
+                    context,
+                    'Device updated successful!',
+                    Colors.green,
+                  );
                 } catch (e) {
                   print('Error updating device: $e');
                   throw Exception('Error updating device');
@@ -89,6 +97,32 @@ class _DeviceCardState extends State<DeviceCard> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget buildImageWidget() {
+    return SizedBox(
+      height: 50,
+      width: 120,
+      child: Image.network(
+        widget.imageUrl,
+        fit: BoxFit.contain,
+        errorBuilder: (context, error, stackTrace) {
+          return Image.asset('assets/images/defaultImage.png');
+        },
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Center(
+            child: CircularProgressIndicator(
+              value:
+                  loadingProgress.expectedTotalBytes != null
+                      ? loadingProgress.cumulativeBytesLoaded /
+                          loadingProgress.expectedTotalBytes!
+                      : null,
+            ),
+          );
+        },
       ),
     );
   }

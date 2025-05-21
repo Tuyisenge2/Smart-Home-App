@@ -3,7 +3,7 @@
 class FetchDeviceResponse {
   final int id;
   final String Device_name;
- // final Map<String, dynamic> Device_room;
+  // final Map<String, dynamic> Device_room;
   final String images_url;
   final bool is_active;
 
@@ -21,7 +21,7 @@ FetchDeviceResponse {
   FetchDeviceResponse({
     required this.id,
     required this.Device_name,
-   // required this.Device_room,
+    // required this.Device_room,
     required this.images_url,
     required this.is_active,
   });
@@ -30,9 +30,9 @@ FetchDeviceResponse {
     return FetchDeviceResponse(
       id: json['id'],
       Device_name: json['Device_name'],
-   //   Device_room: Map<String, dynamic>.from(json['Device_room']),
+      //   Device_room: Map<String, dynamic>.from(json['Device_room']),
       images_url: json['images_url'],
-      is_active: (json['is_active'] ?? 0) == 1,
+      is_active: (json['isActive'] ?? 0) == 1,
     );
   }
 }

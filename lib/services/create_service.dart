@@ -2,7 +2,10 @@
 
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+
+final api = dotenv.env['EMU_API_URL'];
 
 Future<dynamic> signupUser(
   String email,
@@ -12,7 +15,7 @@ Future<dynamic> signupUser(
 ) async {
   try {
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:8000/api/auth/register'),
+      Uri.parse('$api/auth/register'),
       headers: <String, String>{
         'content-Type': 'application/json;charset=UTF-8',
       },
@@ -45,9 +48,9 @@ Future<dynamic> createDevice(
     if (name.isEmpty) {
       throw Exception('Name and room_id are required');
     }
-
+  
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:8000/api/devices'),
+      Uri.parse('$api/devices'),
       headers: <String, String>{
         'Content-Type': 'application/json;charset=UTF-8',
         HttpHeaders.authorizationHeader: "Bearer $token",
@@ -58,6 +61,10 @@ Future<dynamic> createDevice(
         'images': images_url,
       }),
     );
+
+    print('Status Codeeeeeeeeeeeeee: ${response.statusCode}');
+    print('Headerdsssssssssssssssssssssssssssssss: ${response.headers}');
+    print('Bodyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy: ${response.body}');
 
     if (response.statusCode == 201) {
       return {'message': 'device created successfully', 'status': true};
@@ -91,7 +98,7 @@ Future<dynamic> createScene(
     }
 
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:8000/api/scenes'),
+      Uri.parse('$api/scenes'),
       headers: <String, String>{
         'Content-Type': 'application/json;charset=UTF-8',
         HttpHeaders.authorizationHeader: "Bearer $token",
@@ -106,9 +113,9 @@ Future<dynamic> createScene(
         'devices': [18],
       }),
     );
-    // print('Status Codeeeeeeeeeeeeeeeeeeeeee: ${response.statusCode}');
-    // print('Headersdddddddddddddddddddddddddddd: ${response.headers}');
-    // print('Bodyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy: ${response.body}');
+    print('Status Codeeeeeeeeeeeeeeeeeeeeee: ${response.statusCode}');
+    print('Headersdddddddddddddddddddddddddddd: ${response.headers}');
+    print('Bodyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy: ${response.body}');
     if (response.statusCode == 201) {
       return {'message': 'Scenes created successfully', 'status': true};
     } else if (response.statusCode == 200) {
@@ -119,7 +126,6 @@ Future<dynamic> createScene(
     throw Exception('Failed to load device creation response: $e');
   }
 }
-
 
 // Future<dynamic> createScene(dynamic request,String token) async {
 //   final apiService = ApiService(

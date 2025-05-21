@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:new_app/pages/Dashboard/Dashboard.dart';
 //import 'package:new_app/pages/ResetPassword.dart' show Resetpassword;
@@ -18,8 +19,10 @@ import 'package:new_app/provider/scene_provider.dart';
 import 'package:new_app/provider/user_provider.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
   // runApp(MyApp());
+  await dotenv.load(fileName: "lib/.env");
+ 
   runApp(
     MultiProvider(
       providers: [
@@ -58,6 +61,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //    print(dotenv.env['VarName']);
     return MaterialApp.router(
       title: 'Flutter Demo',
       debugShowCheckedModeBanner: false,
